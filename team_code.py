@@ -159,7 +159,12 @@ def load_two_lead_model(model_directory):
 
 # Generic function for loading a model.
 def load_model(filename):
-	return tf.keras.models.load_model(filename)
+	# Custom Metrics
+	lr_metric = get_lr_metric(optimizer)
+	auroc = tf.keras.metrics.AUC()
+	F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
+	custom_objects = {'F1': F1, 'auroc': auroc, 'lr_metric': lr_metric}
+	return tf.keras.models.load_model(filename, custom_objects=custom_objects)
 
 ################################################################################
 #
