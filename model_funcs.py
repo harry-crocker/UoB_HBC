@@ -418,7 +418,7 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 	
 	model.compile(loss=loss, 
 				  optimizer=optimizer,
-				  metrics=['accuracy', auroc, F1, lr_metric])
+				  metrics=['accuracy'   ])#   , auroc, F1, lr_metric])
 
 	return model
 
