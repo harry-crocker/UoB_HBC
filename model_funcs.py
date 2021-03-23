@@ -63,6 +63,7 @@ def train_generator(header_files, recording_files, wind, bs):
 			retX = np.array(inputs)
 			print(retX.shape)
 			rety = np.array(targets)
+			print(rety.shape)
 			yield (retX, rety)
 			# Generator will resume here after yield
 			inputs = []
@@ -418,7 +419,7 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 	
 	model.compile(loss=loss, 
 				  optimizer=optimizer,
-				  metrics=['accuracy'   ])#   , auroc, F1, lr_metric])
+				  metrics=['accuracy' , auroc, F1, lr_metric])
 
 	return model
 
