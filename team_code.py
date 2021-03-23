@@ -136,7 +136,7 @@ def save_object(obj, filename):
 
 def load_object(filename):
     with open(filename, 'rb') as file:  # Overwrites any existing file.
-        return dill.load(obj, file)
+        return dill.load(file)
 
 # Save your trained models.
 ## Dont use this
