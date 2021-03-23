@@ -18,9 +18,8 @@ from data_funcs import *
 
 ######
 # Generator functions for producing segments of ECG
-def train_generator(header_files, recording_files, wind, bs):
+def train_generator(header_files, recording_files, classes, wind, bs):
 	num_recordings = len(recording_files)
-	classes = get_classes() # List of possible classes 
 
 	# Need to reset these every batch
 	inputs = []
@@ -64,6 +63,7 @@ def train_generator(header_files, recording_files, wind, bs):
 			print(retX.shape)
 			rety = np.array(targets)
 			print(rety.shape)
+			print(np.sum(rety))
 			yield (retX, rety)
 			# Generator will resume here after yield
 			inputs = []

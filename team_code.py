@@ -89,7 +89,7 @@ def training_code(data_directory, model_directory):
 								config.Window_length, lap, config.filters, config.kernel_sizes, config.head_nodes)
 
 	# Train model
-	history = model.fit(train_generator(header_files, recording_files, config.Window_length, config.batch_size), 
+	history = model.fit(train_generator(header_files, recording_files, classes, config.Window_length, config.batch_size), 
 					steps_per_epoch= steps // config.epochs,
 					epochs=config.epochs, 
 					batch_size=config.batch_size, 
