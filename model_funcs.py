@@ -34,8 +34,8 @@ def train_generator(header_files, recording_files, wind, bs):
 		file_idx = file_idxs[bc]
 
 		# Load the full recording and header 
-		header = load_header(header_files[i])
-		recording = load_recording(recording_files[i])
+		header = load_header(header_files[file_idx])
+		recording = load_recording(recording_files[file_idx])
 		recording = np.swapaxes(recording, 0, 1)    # Needs to be of form (num_samples, num_channels)
 
 		# Get class labels from header
