@@ -75,7 +75,6 @@ def one_hot_encode_labels(header, classes):
 	num_classes = len(classes)
 	labels = np.zeros(num_classes, dtype=np.bool) # One-hot encoding of classes
 	current_labels = get_labels(header)
-	print(current_labels[])
 	for label in current_labels:
 		if label in classes:
 			j = classes.index(label)
