@@ -3,7 +3,7 @@
 # Edit this script to add your team's training code.
 # Some functions are *required*, but you can edit most parts of required functions, remove non-required functions, and add your own function.
 
-import pickle
+import dill
 from helper_code import *
 import numpy as np, os, sys, joblib
 import tensorflow as tf
@@ -133,11 +133,11 @@ def training_code(data_directory, model_directory):
 
 def save_object(obj, filename):
     with open(filename, 'wb') as output:  # Overwrites any existing file.
-        pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+        dill.dump(obj, output, pickle.HIGHEST_PROTOCOL)
 
 def load_object(filename):
     with open(filename, 'rb') as file:  # Overwrites any existing file.
-        return pickle.load(obj, file)
+        return dill.load(obj, file)
 
 # Save your trained models.
 ## Dont use this
