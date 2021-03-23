@@ -66,16 +66,16 @@ def get_classes():
 	path_to_classes = os.path.join(sys.path[0], 'dx_mapping_scored.csv')
 	df = pd.read_csv(path_to_classes)
 	SNOMED_CT_Codes = list(df['SNOMED CT Code'])
+	SNOMED_CT_Codes = [str(item) for item in SNOMED_CT_Codes]
 	class_abbreviations = list(df['Abbreviation'])
 	return SNOMED_CT_Codes, class_abbreviations
 
 
 def one_hot_encode_labels(header, classes):
-	#####
-	# need to ensure the header label and class labels are both of same data type (cant mix string and int)
 	num_classes = len(classes)
 	labels = np.zeros(num_classes, dtype=np.bool) # One-hot encoding of classes
 	current_labels = get_labels(header)
+	print(current_labels[])
 	for label in current_labels:
 		if label in classes:
 			j = classes.index(label)
