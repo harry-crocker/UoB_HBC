@@ -133,7 +133,7 @@ def training_code(data_directory, model_directory):
 
 def save_object(obj, filename):
     with open(filename, 'wb') as output:  # Overwrites any existing file.
-        dill.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+        dill.dump(obj, output)
 
 def load_object(filename):
     with open(filename, 'rb') as file:  # Overwrites any existing file.
