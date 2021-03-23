@@ -39,6 +39,12 @@ def train_generator(header_files, recording_files, classes, wind, bs):
 
 		# Get class labels from header
 		labels = one_hot_encode_labels(header, classes)
+		if np.sum(labels) == 0:
+			# Labels are not in classes so not an appropriate ecg for training
+			# Continue will skip
+			# Set file index to a new random value else the same ecg will be reselected forever
+			file_idxs[bc] = np.random.randint(0, num_recordings)
+			continue
 		targets.append(labels)
 
 		# Get sampling data from header
