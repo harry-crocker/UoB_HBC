@@ -74,6 +74,8 @@ def one_hot_encode_labels(header, classes):
 	#####
 	# need to ensure the header label and class labels are both of same data type (cant mix string and int)
 	num_classes = len(classes)
+	print(classes)
+	print(num_classes)
 	labels = np.zeros(num_classes, dtype=np.bool) # One-hot encoding of classes
 	current_labels = get_labels(header)
 	for label in current_labels:
