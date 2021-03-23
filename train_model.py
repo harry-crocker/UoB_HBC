@@ -6,16 +6,16 @@ import sys
 from team_code import training_code
 
 if __name__ == '__main__':
-    # Parse arguments.
-    if len(sys.argv) != 3:
-        raise Exception('Include the data and model folders as arguments, e.g., python train_model.py data model.')
+	# Parse arguments.
+	if len(sys.argv) != 3:
+		raise Exception('Include the data and model folders as arguments, e.g., python train_model.py data model.')
 
-    data_directory = sys.argv[1]
-    model_directory = sys.argv[2]
+	data_directory = sys.argv[1]
+	model_directory = sys.argv[2]
 
-    # Run the training code.
-    print('Running training code...')
+	# Run the training code.
+	print('Running training code...')
 
-    training_code(data_directory, model_directory)
+	training_code(data_directory, model_directory)
 
-    print('Done.')
+	print('Done.')
