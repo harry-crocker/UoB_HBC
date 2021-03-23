@@ -6,8 +6,6 @@
 from helper_code import *
 import numpy as np, os, sys, joblib
 import tensorflow as tf
-from sklearn.impute import SimpleImputer
-from sklearn.ensemble import RandomForestClassifier
 from model_funcs import *
 from data_funcs import *
 
@@ -61,7 +59,7 @@ def training_code(data_directory, model_directory):
 	config = Config_file()
 
 	config.num_modules = 6 # 6
-	config.epochs = 10 # PTB-XL = 50
+	config.epochs = 1 # PTB-XL = 50
 	config.lr = 3e-3  # 1e-2
 	config.batch_size = 128  # PTB-XL = 128
 	config.ctype = 'subdiagnostic'
@@ -73,6 +71,7 @@ def training_code(data_directory, model_directory):
 	config.filters = 32
 	config.kernel_sizes = [9, 23, 49]
 	config.head_nodes = 2048
+	config.num_classes = num_classes
 
 	input_shape = [config.Window_length, 12]
 	lap = 0.5
@@ -98,7 +97,8 @@ def training_code(data_directory, model_directory):
 
 	# Save model
 	filename = os.path.join(model_directory, twelve_lead_model_filename)
-	model.save(filename)
+	model.save_weights(filename)
+	joblib.dump(config, filename+'Config')
 
 	# Train models
 
@@ -159,7 +159,13 @@ def load_two_lead_model(model_directory):
 
 # Generic function for loading a model.
 def load_model(filename):
-	return tf.keras.models.load_model(filename)
+	config = joblib.load(filename+'Config')
+	input_shape = [config.Window_length, 12]
+	lap = 0.5
+	model = Build_InceptionTime(input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
+								config.Window_length, lap, config.filters, config.kernel_sizes, config.head_nodes)
+	model.load_weights(filename)
+	return model
 
 ################################################################################
 #
