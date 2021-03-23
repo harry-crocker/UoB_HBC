@@ -159,7 +159,7 @@ def load_two_lead_model(model_directory):
 
 # Generic function for loading a model.
 def load_model(filename):
-	return tf.keras.models.load_model(filename, custom_objects=custom_objects)
+	return tf.keras.models.load_model(filename)
 
 ################################################################################
 #
