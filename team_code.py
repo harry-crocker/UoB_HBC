@@ -61,7 +61,7 @@ def training_code(data_directory, model_directory):
 	config = Config_file()
 
 	config.num_modules = 6 # 6
-	config.epochs = 2 # PTB-XL = 50
+	config.epochs = 50 # PTB-XL = 50
 	config.lr = 3e-3  # 1e-2
 	config.batch_size = 128  # PTB-XL = 128
 	config.ctype = 'subdiagnostic'
