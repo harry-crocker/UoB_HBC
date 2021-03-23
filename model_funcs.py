@@ -61,6 +61,7 @@ def train_generator(header_files, recording_files, wind, bs):
 		if bc >= bs:
 			# End of batch, output and reset
 			retX = np.array(inputs)
+			print(retX.shape)
 			rety = np.array(targets)
 			yield (retX, rety)
 			# Generator will resume here after yield
