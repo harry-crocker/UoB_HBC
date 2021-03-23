@@ -86,6 +86,8 @@ def one_hot_encode_labels(header, classes):
 # downsample to 100hz for the model to accept
 def downsample_recording(recording, frequency, num_samples):
 	ecg_len = num_samples/frequency  # Length of time in seconds
+	if not type(num_samples) == type(int(1)):
+		print(num_samples, type(num_samples))
 	t = np.linspace(0, ecg_len, num=num_samples)
 	# Create an interpolation class to return the values at a given t_new
 	interp_func = interpolate.interp1d(x, recording, kind='linear', axis=0, assume_sorted=True)
