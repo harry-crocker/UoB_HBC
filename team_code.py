@@ -21,7 +21,8 @@ two_lead_model_filename = '2_lead_model'
 # Training function
 #
 ################################################################################
-
+class Config_file():
+	pass
 
 # Train your model. This function is *required*. Do *not* change the arguments of this function.
 def training_code(data_directory, model_directory):
@@ -54,8 +55,6 @@ def training_code(data_directory, model_directory):
 
 	# run = wandb.init(project='HeartbeatClassification')
 	# config = wandb.config
-	class Config_file():
-		pass
 
 	config = Config_file()
 
