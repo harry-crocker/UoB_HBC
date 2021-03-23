@@ -63,8 +63,8 @@ def recordings_to_keep(header_files, recording_files, data_directory, training):
 
 
 def get_classes():
-	path_to_classes = os.path.join(sys.path[0], 'evaluation/dx_mapping_scored.csv')
-	df = pd.read_csv('/content/HeartbeatClassification/evaluation/dx_mapping_scored.csv')
+	path_to_classes = os.path.join(sys.path[0], 'dx_mapping_scored.csv')
+	df = pd.read_csv(path_to_classes)
 	SNOMED_CT_Codes = list(df['SNOMED CT Code'])
 	class_abbreviations = list(df['Abbreviation'])
 	return SNOMED_CT_Codes, class_abbreviations
