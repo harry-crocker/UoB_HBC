@@ -61,7 +61,7 @@ def training_code(data_directory, model_directory):
 	config = Config_file()
 
 	config.num_modules = 6 # 6
-	config.epochs = 50 # PTB-XL = 50
+	config.epochs = 10 # PTB-XL = 50
 	config.lr = 3e-3  # 1e-2
 	config.batch_size = 128  # PTB-XL = 128
 	config.ctype = 'subdiagnostic'
@@ -159,11 +159,6 @@ def load_two_lead_model(model_directory):
 
 # Generic function for loading a model.
 def load_model(filename):
-	# Custom Metrics
-	# lr_metric = get_lr_metric(optimizer)
-	# auroc = tf.keras.metrics.AUC()
-	F1 = tfa.metrics.F1Score(num_classes=27, threshold=0.5, average='macro')
-	custom_objects = {'F1': F1}
 	return tf.keras.models.load_model(filename, custom_objects=custom_objects)
 
 ################################################################################
