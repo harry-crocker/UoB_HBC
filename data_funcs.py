@@ -89,7 +89,7 @@ def downsample_recording(recording, frequency, num_samples):
 	num_samples = int(num_samples)
 	t = np.linspace(0, ecg_len, num=num_samples)
 	# Create an interpolation class to return the values at a given t_new
-	interp_func = interpolate.interp1d(x, recording, kind='linear', axis=0, assume_sorted=True)
+	interp_func = interpolate.interp1d(t, recording, kind='linear', axis=0, assume_sorted=True)
 
 	freq_new = 100
 	num_samples_new = int(ecg_len*freq_new)
