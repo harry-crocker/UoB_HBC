@@ -79,6 +79,10 @@ def one_hot_encode_labels(header, classes):
 		if label in classes:
 			j = classes.index(label)
 			labels[j] = 1
+
+	if np.sum(labels) == 0:
+		print('No matching labels from:', len(current_labels), 'found labels')
+		print(current_labels)
 	return labels
 
 
