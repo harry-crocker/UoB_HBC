@@ -3,6 +3,7 @@
 # Edit this script to add your team's training code.
 # Some functions are *required*, but you can edit most parts of required functions, remove non-required functions, and add your own function.
 
+import pickle
 from helper_code import *
 import numpy as np, os, sys, joblib
 import tensorflow as tf
@@ -98,7 +99,7 @@ def training_code(data_directory, model_directory):
 	# Save model
 	filename = os.path.join(model_directory, twelve_lead_model_filename)
 	model.save_weights(filename)
-	joblib.dump(config, filename+'Config')
+	save_object(config, filename+'Config.pkl')
 
 	# Train models
 
@@ -130,6 +131,14 @@ def training_code(data_directory, model_directory):
 #
 ################################################################################
 
+def save_object(obj, filename):
+    with open(filename, 'wb') as output:  # Overwrites any existing file.
+        pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+
+def load_object(filename):
+    with open(filename, 'rb') as file:  # Overwrites any existing file.
+        return pickle.load(obj, file)
+
 # Save your trained models.
 ## Dont use this
 def save_model(filename, classes, leads, imputer, classifier):
@@ -159,7 +168,7 @@ def load_two_lead_model(model_directory):
 
 # Generic function for loading a model.
 def load_model(filename):
-	config = joblib.load(filename+'Config')
+	config = load_object(filename+'Config.pkl')
 	input_shape = [config.Window_length, 12]
 	lap = 0.5
 	model = Build_InceptionTime(input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
