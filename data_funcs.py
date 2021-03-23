@@ -4,7 +4,7 @@ import pandas as pd
 from scipy import interpolate
 
 
-from classifier.helper_code import *
+from helper_code import *
 
 
 def get_data(data_directory, training=True):

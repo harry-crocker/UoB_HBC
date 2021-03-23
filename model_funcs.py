@@ -8,7 +8,7 @@ from tensorflow.keras import layers
 import tensorflow_addons as tfa
 import transformers
 
-from classifier.helper_code import *
+from helper_code import *
 from data_funcs import *
 
 ######

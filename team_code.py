@@ -8,8 +8,8 @@ import numpy as np, os, sys, joblib
 import tensorflow as tf
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import RandomForestClassifier
-from ..model_funcs import *
-from ..data_funcs import *
+from model_funcs import *
+from data_funcs import *
 
 # To change when found save model
 twelve_lead_model_filename = '12_lead_model'
