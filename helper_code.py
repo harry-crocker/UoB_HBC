@@ -47,7 +47,7 @@ def load_header(header_file):
 
 # Save headerfile back to new location
 def save_header(header_file, header):
-	with open(header_file, 'wb') as f:
+	with open(header_file, 'w') as f:
 		f.write(header)
 
 # Load recording file as an array.
