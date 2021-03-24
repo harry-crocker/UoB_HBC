@@ -32,8 +32,10 @@ def test_model(model_directory, data_directory, output_directory):
 
     # Run model for each recording.
     print('Running model...')
-
-    for i in range(num_recordings):
+    ###############
+    # Change this back
+    ############
+    for i in range(num_recordings//10):
         print('    {}/{}...'.format(i+1, num_recordings))
 
         # Load header and recording.

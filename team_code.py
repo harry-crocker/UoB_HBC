@@ -92,7 +92,6 @@ def training_code(data_directory, model_directory):
 					steps_per_epoch= steps // config.epochs,
 					epochs=config.epochs, 
 					batch_size=config.batch_size, 
-					# validation_data=(X_val, y_val),
 					callbacks=cbs)
 
 	# Save model
@@ -130,6 +129,7 @@ def training_code(data_directory, model_directory):
 #
 ################################################################################
 
+# I created these 2 functions
 def save_object(obj, filename):
     with open(filename, 'wb') as output:  # Overwrites any existing file.
         dill.dump(obj, output)
@@ -137,6 +137,7 @@ def save_object(obj, filename):
 def load_object(filename):
     with open(filename, 'rb') as file:  # Overwrites any existing file.
         return dill.load(file)
+
 
 # Save your trained models.
 ## Dont use this
