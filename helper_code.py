@@ -45,6 +45,11 @@ def load_header(header_file):
 		header = f.read()
 	return header
 
+# Save headerfile back to new location
+def save_header(header_file, header):
+	with open(header_file, 'wb') as f:
+		f.write(header)
+
 # Load recording file as an array.
 def load_recording(recording_file, header=None, leads=None, key='val'):
 	x = loadmat(recording_file)[key]
@@ -174,11 +179,15 @@ def get_labels(header):
 	return labels
 
 # Save outputs from model.
-def save_outputs(output_file, classes, labels, probabilities):
+def save_outputs(output_file, classes, labels, probabilities, header):
 	# Extract the recording identifier from the filename.
 	head, tail = os.path.split(output_file)
 	root, extension = os.path.splitext(tail)
 	recording_identifier = root
+
+	header_file = os.path.splitext(output_file)[0] +'.hea'
+	save_header(header_file, header)
+
 
 	# Format the model outputs.
 	recording_string = '#{}'.format(recording_identifier)
