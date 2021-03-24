@@ -221,7 +221,7 @@ def run_model(model, header, recording):
 	labels = np.where(outputs > thresh, 1, 0)
 	labels = list(labels[0])
 
-	probabilities = list(outputs[0])
+	probabilities = list(np.array(outputs[0]))
 
 	return classes, labels, probabilities
 

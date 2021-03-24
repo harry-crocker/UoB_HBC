@@ -36,7 +36,7 @@ def test_model(model_directory, data_directory, output_directory):
     # Change this back
     ############
     for i in range(num_recordings//10):
-        print('    {}/{}...'.format(i+1, num_recordings))
+        print('    {}/{}...'.format(i+1, num_recordings//10))
 
         # Load header and recording.
         header = load_header(header_files[i])
