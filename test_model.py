@@ -60,7 +60,7 @@ def test_model(model_directory, data_directory, output_directory):
         head, tail = os.path.split(header_files[i])
         root, extension = os.path.splitext(tail)
         output_file = os.path.join(output_directory, root + '.csv')
-        save_outputs(output_file, classes, labels, probabilities)
+        save_outputs(output_file, classes, labels, probabilities, header)
 
     print('Done.')
 
