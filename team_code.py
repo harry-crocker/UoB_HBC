@@ -223,6 +223,13 @@ def run_model(model, header, recording):
 
 	probabilities = list(np.array(outputs[0]))
 
+	# Remove normal label if other problems found
+	normal_class = '426783006'
+	norm_idx = classes.index(normal_class)
+	if labels[norm_idx] == 1 and sum(labels) > 1:
+		labels[norm_idx] == 0
+
+
 	return classes, labels, probabilities
 
 ################################################################################
