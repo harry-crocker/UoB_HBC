@@ -217,19 +217,19 @@ class CustomModel(keras.Model):
 		self.wind = wind
 		self.lap=lap
 
-	def test_step(self, data):
-		# Overwrite what happens in model.evaluate by 
-		# Unpack the data
-		x, y = data
-		# Compute predictions
-		y_pred = self.compute_predictions(x)
-		# Updates the metrics tracking the loss
-		self.compiled_loss(y, y_pred, regularization_losses=self.losses)
-		# Update the metrics.
-		self.compiled_metrics.update_state(y, y_pred)
-		# Return a dict mapping metric names to current value.
-		# Note that it will include the loss (tracked in self.metrics).
-		return {m.name: m.result() for m in self.metrics}
+	# def test_step(self, data):
+	# 	# Overwrite what happens in model.evaluate by 
+	# 	# Unpack the data
+	# 	x, y = data
+	# 	# Compute predictions
+	# 	y_pred = self.compute_predictions(x)
+	# 	# Updates the metrics tracking the loss
+	# 	self.compiled_loss(y, y_pred, regularization_losses=self.losses)
+	# 	# Update the metrics.
+	# 	self.compiled_metrics.update_state(y, y_pred)
+	# 	# Return a dict mapping metric names to current value.
+	# 	# Note that it will include the loss (tracked in self.metrics).
+	# 	return {m.name: m.result() for m in self.metrics}
 
 	def compute_predictions(self, X):
 		wind = self.wind
