@@ -116,6 +116,9 @@ def get_features(header, recording, leads, wide_features=False, preprocessing=Fa
 			sex = 1
 		else:
 			sex = float('nan')
+	else:
+		age=0
+		sex=0
 
 	# Reorder/reselect leads in recordings.
 	# Need to get this into training generator
