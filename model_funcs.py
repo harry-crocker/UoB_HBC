@@ -366,7 +366,7 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 
 # Threshold funnctions
 def find_thresholds(y_labels, y_hat):
-	best_thresh = [0]*y_labels.shape[1]
+	best_thresh = [0.5]*y_labels.shape[1]
 	best_thresh_f1 = [0]*y_labels.shape[1]
 
 	for i in range(y_labels.shape[1]):

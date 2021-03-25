@@ -96,7 +96,7 @@ def training_code(data_directory, model_directory):
 	labels = []
 	num_val = len(val_recording_files)
 	# Package model
-	model = (model, config)
+	val_model = (model, config)
 	# Loop through all validation set and calculate predictions (probabilities)
 	# This code block is similar to in test_model.py
 	for i in range(num_val//10):
@@ -109,7 +109,7 @@ def training_code(data_directory, model_directory):
 
 		# Apply model to recording.
 		if all(lead in leads for lead in twelve_leads):
-			_, _, probabilities = run_twelve_lead_model(model, header, recording)
+			_, _, probabilities = run_twelve_lead_model(val_model, header, recording)
 
 		predictions.append(probabilities)
 
