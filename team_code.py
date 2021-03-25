@@ -37,7 +37,7 @@ def training_code(data_directory, model_directory):
 	print('Extracting features and labels...')
 	# In the real submission all training files are in a single folder
 	header_files, recording_files = find_challenge_files(data_directory)
-	train_header_files, train_recording_files, val_header_files, val_recording_files = train_val_split(header_files, recording_files, 0.1)
+	train_header_files, train_recording_files, val_header_files, val_recording_files = train_val_split(header_files, recording_files, 0.05)
 
 	num_recordings = len(recording_files)
 	print(num_recordings, 'Files found')
@@ -49,7 +49,7 @@ def training_code(data_directory, model_directory):
 	config.leads = twelve_leads
 	config.num_leads = len(config.leads)
 	config.num_modules = 6 # 6
-	config.epochs = 1 # PTB-XL = 50
+	config.epochs = 50 # PTB-XL = 50
 	config.lr = 3e-3  # 1e-2
 	config.batch_size = 128  # PTB-XL = 128
 	config.ctype = 'subdiagnostic'
@@ -58,7 +58,7 @@ def training_code(data_directory, model_directory):
 	config.Window_length = 125 # 250
 	config.loss_func = 'BC'   # BC Or F1
 	config.SpE = 1 # 1
-	config.filters = 32
+	config.filters = 64
 	config.kernel_sizes = [9, 23, 49]
 	config.head_nodes = 2048
 	config.num_classes = num_classes
@@ -99,8 +99,8 @@ def training_code(data_directory, model_directory):
 	val_model = (model, config)
 	# Loop through all validation set and calculate predictions (probabilities)
 	# This code block is similar to in test_model.py
-	for i in range(num_val//10):
-		print('    {}/{}...'.format(i+1, num_val//10))
+	for i in range(num_val):
+		print('    {}/{}...'.format(i+1, num_val))
 
 		# Load header and recording.
 		header = load_header(val_header_files[i])
