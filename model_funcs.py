@@ -14,7 +14,7 @@ from data_funcs import *
 ######
 # TO DO LIST
 # - Modify generator to drop some leads where needed
-# - Use better thresholds in run_model()
+# - replace get_features with a since func to preprocess recording for use in generator and predictions
 
 ######
 # Generator functions for producing segments of ECG
@@ -216,7 +216,7 @@ class CustomModel(keras.Model):
 		super().__init__(**kwargs)
 		self.wind = wind
 		self.lap=lap
-	
+
 	def test_step(self, data):
 		# Overwrite what happens in model.evaluate by 
 		# Unpack the data
@@ -230,7 +230,7 @@ class CustomModel(keras.Model):
 		# Return a dict mapping metric names to current value.
 		# Note that it will include the loss (tracked in self.metrics).
 		return {m.name: m.result() for m in self.metrics}
-	
+
 	def compute_predictions(self, X):
 		wind = self.wind
 		lap = self.lap
@@ -248,70 +248,7 @@ class CustomModel(keras.Model):
 		y_pred = tf.stack(y_pred, axis=2)
 		y_pred = tf.math.reduce_max(y_pred, axis=2)
 		return y_pred
-		
-	def find_thresholds(self, y_labels, y_hat):
-		best_thresh = [0]*y_labels.shape[1]
-		best_thresh_f1 = [0]*y_labels.shape[1]
-
-		for i in range(y_labels.shape[1]):
-			thresh = 0
-			increment = 1e-3
-			y = y_labels[:, i]
-			while thresh < 1:
-				thresh += increment
-				y_pred = np.where(y_hat[:, i] > thresh, 1, 0)
-				tp = np.count_nonzero(y_pred * y, axis=0)
-				fp = np.count_nonzero(y_pred * (1 - y), axis=0)
-				fn = np.count_nonzero((1 - y_pred) * y, axis=0)
-				f1 = 2*tp / (2*tp + fn + fp + 1e-16)
-
-				# If new F1 score is better than previous then update threshold
-				if f1 > best_thresh_f1[i]:
-					best_thresh_f1[i] = f1
-					best_thresh[i] = thresh
-
-		print('F1 Score on Validation:', np.mean(best_thresh_f1))
-		return best_thresh
 	
-	def macro_f1(self, y, y_hat, thresh=0.5, thresholds=None):
-		"""Compute the macro F1-score on a batch of observations (average F1 across labels)
-
-		Args:
-			y (int32 Tensor): labels array of shape (BATCH_SIZE, N_LABELS)
-			y_hat (float32 Tensor): probability matrix from forward propagation of shape (BATCH_SIZE, N_LABELS)
-			thresh: probability value above which we predict positive
-
-		Returns:
-			macro_f1 (scalar Tensor): value of macro F1 for the batch
-		"""
-		y_pred = np.zeros(y.shape)
-
-		for i in range(y.shape[1]):
-			if thresholds:
-				thresh = thresholds[i]
-			y_pred[:, i] = np.where(y_hat[:, i] > thresh, 1, 0)
-
-		tp = np.count_nonzero(y_pred * y, axis=0)
-		fp = np.count_nonzero(y_pred * (1 - y), axis=0)
-		fn = np.count_nonzero((1 - y_pred) * y, axis=0)
-		f1 = 2*tp / (2*tp + fn + fp + 1e-16)
-		macro_f1 = f1.mean()
-		return macro_f1
-	
-	def eval_on_test(self, X_val, y_val, X_test, y_test):
-		# Function identifies the optimal thresholds based on the validation set and then provides the F1 score for both sets
-		wind=self.wind
-		lap=self.lap
-		y_hat = self.compute_predictions(X_val, wind, lap)
-		self.best_thresh = self.find_thresholds(y_val, y_hat)
-		
-		y_hat = self.compute_predictions(X_test, wind, lap)
-		test_F1 = self.macro_f1(y_test, y_hat, thresholds=self.best_thresh)
-		test_F1_nothresh = self.macro_f1(y_test, y_hat)
-		print('F1 Score on Test:', test_F1)
-		print('F1 Score on Test with thresh=0.5:', test_F1_nothresh)
-		return max([test_F1,test_F1_nothresh])
-
 
 def InceptionModule(input_tensor, num_filters=32, bottleneck_size=32, activation='linear', strides=1, bias=False, kernel_sizes=None):
 	reg = None
@@ -416,22 +353,41 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 		optimizer = transformers.AdamWeightDecay(learning_rate=learning_rate, weight_decay_rate=wd )#, beta_2=0.99, epsilon=1e-5)
 	
 	# # Metrics
-	# lr_metric = get_lr_metric(optimizer)
-	# auroc = tf.keras.metrics.AUC()
-	# F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
+	lr_metric = get_lr_metric(optimizer)
+	auroc = tf.keras.metrics.AUC()
+	F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
 	
 	model.compile(loss=loss, 
 				  optimizer=optimizer,
-				  metrics=['accuracy']) # , auroc, F1, lr_metric])
+				  metrics=['accuracy', auroc, F1, lr_metric])
 
 	return model
 
 
+# Threshold funnctions
+def find_thresholds(y_labels, y_hat):
+	best_thresh = [0]*y_labels.shape[1]
+	best_thresh_f1 = [0]*y_labels.shape[1]
 
+	for i in range(y_labels.shape[1]):
+		thresh = 0
+		increment = 1e-3
+		y = y_labels[:, i]
+		while thresh < 1:
+			thresh += increment
+			y_pred = np.where(y_hat[:, i] > thresh, 1, 0)
+			tp = np.count_nonzero(y_pred * y, axis=0)
+			fp = np.count_nonzero(y_pred * (1 - y), axis=0)
+			fn = np.count_nonzero((1 - y_pred) * y, axis=0)
+			f1 = 2*tp / (2*tp + fn + fp + 1e-16)
 
+			# If new F1 score is better than previous then update threshold
+			if f1 > best_thresh_f1[i]:
+				best_thresh_f1[i] = f1
+				best_thresh[i] = thresh
 
-
-
+	print('F1 Score on Validation:', np.mean(best_thresh_f1))
+	return best_thresh
 
 
 

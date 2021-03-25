@@ -3,11 +3,15 @@ import numpy as np
 import pandas as pd
 from scipy import interpolate
 
-
 from helper_code import *
 
+# Class for empty config file
+class Config_file():
+	pass
 
-def get_data(data_directory, training=True):
+# Not used and broken
+# Files of different lengths cannot be in the same numpy array
+def get_data(header_files, recording_files):
 	# Returns the X, Z and y data for this dataset
 
 	data = [] 
@@ -37,29 +41,6 @@ def get_data(data_directory, training=True):
 	y = labels
 	print('Recordings shape:', X.shape, y.shape)
 	return X, y
-
-
-
-def recordings_to_keep(header_files, recording_files, data_directory, training):
-	# Returns the indexes of the recordings to keep based on training and dataset
-	# Get the folder name of the dataset being processed
-	dataset = data_directory.split('/')[-1]
-	print('Processing:', dataset)
-
-	if dataset == 'WFDB_PTBXL':
-		# Load csv file
-		path = os.path.join(sys.path[0], 'ptbxl_database.csv')
-		Y = pd.read_csv(path, index_col='ecg_id')
-		if training:
-			to_keep = np.where(Y.strat_fold < 9)
-		else:
-			to_keep = np.where(Y.strat_fold >= 9)
-
-		header_files = header_files[to_keep]
-		recording_files = recording_files[to_keep]
-
-
-	return header_files, recording_files
 
 
 def get_classes():
@@ -96,6 +77,66 @@ def downsample_recording(recording, frequency, num_samples):
 	t_new = np.linspace(0, ecg_len, num=num_samples_new)
 	recording_new = interp_func(t_new)
 	return recording_new
+
+
+def train_val_split(header_files, recording_files, percent):
+	num_files = len(header_files)
+	rands = np.random.random(num_files)
+
+	train_header_files = []
+	val_header_files = []
+	train_recording_files = []
+	val_recording_files = []
+
+	for i in range(num_files):
+		if rands[i] < percent:
+			val_header_files.append(header_files[i])
+			val_recording_files.append(recording_files[i])
+		else:
+			train_header_files.append(header_files[i])
+			train_recording_files.append(recording_files[i])
+
+	return train_header_files, train_recording_files, val_header_files, val_recording_files
+
+
+# Extract features from the header and recording.
+# Important for selecting leads
+def get_features(header, recording, leads, wide_features=False, preprocessing=False):
+	# Extract age.
+	if wide_features:
+		age = get_age(header)
+		if age is None:
+			age = float('nan')
+
+		# Extract sex. Encode as 0 for female, 1 for male, and NaN for other.
+		sex = get_sex(header)
+		if sex in ('Female', 'female', 'F', 'f'):
+			sex = 0
+		elif sex in ('Male', 'male', 'M', 'm'):
+			sex = 1
+		else:
+			sex = float('nan')
+
+	# Reorder/reselect leads in recordings.
+	# Need to get this into training generator
+	available_leads = get_leads(header)
+	indices = list()
+	for lead in leads:
+		i = available_leads.index(lead)
+		indices.append(i)
+	recording = recording[indices, :]
+
+	# Pre-process recordings.
+	if preprocessing:
+		adc_gains = get_adcgains(header, leads)
+		baselines = get_baselines(header, leads)
+		num_leads = len(leads)
+		for i in range(num_leads):
+			recording[i, :] = (recording[i, :] - baselines[i]) / adc_gains[i]
+
+	return age, sex, recording
+
+
 
 
 

@@ -21,8 +21,6 @@ two_lead_model_filename = '2_lead_model'
 # Training function
 #
 ################################################################################
-class Config_file():
-	pass
 
 # Train your model. This function is *required*. Do *not* change the arguments of this function.
 def training_code(data_directory, model_directory):
@@ -37,29 +35,21 @@ def training_code(data_directory, model_directory):
 
 	# Extract features and labels from dataset.
 	print('Extracting features and labels...')
-	X = []
-	y = []
-
 	# In the real submission all training files are in a single folder
 	header_files, recording_files = find_challenge_files(data_directory)
-	# Drop files in train/test split
-	# header_files, recording_files = recordings_to_keep(header_files, recording_files, data_directory, training)
+	train_header_files, train_recording_files, val_header_files, val_recording_files = train_val_split(header_files, recording_files, 0.1)
+
 	num_recordings = len(recording_files)
 	print(num_recordings, 'Files found')
 	if not num_recordings:
 		raise Exception('No data within:', data_directory.split('/')[-1])
 
-
-
 	# Load model configuration file
-
-	# run = wandb.init(project='HeartbeatClassification')
-	# config = wandb.config
-
 	config = Config_file()
-
+	config.leads = twelve_leads
+	config.num_leads = len(config.leads)
 	config.num_modules = 6 # 6
-	config.epochs = 50 # PTB-XL = 50
+	config.epochs = 10 # PTB-XL = 50
 	config.lr = 3e-3  # 1e-2
 	config.batch_size = 128  # PTB-XL = 128
 	config.ctype = 'subdiagnostic'
@@ -72,9 +62,13 @@ def training_code(data_directory, model_directory):
 	config.kernel_sizes = [9, 23, 49]
 	config.head_nodes = 2048
 	config.num_classes = num_classes
+	config.classes = classes
+	config.lap = 0.5
+	config.input_shape = [config.Window_length, config.num_leads]
+	config.thresholds = [0.5]*num_classes
 
-	input_shape = [config.Window_length, 12]
-	lap = 0.5
+	
+	
 
 	cbs = []
 	# cbs.append(WandbCallback())
@@ -84,43 +78,50 @@ def training_code(data_directory, model_directory):
 	cbs.append(lr_schedule)
 		
 	# Build Model
-	model = Build_InceptionTime(input_shape, num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
-								config.Window_length, lap, config.filters, config.kernel_sizes, config.head_nodes)
+	model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
+								config.Window_length, config.lap, config.filters, config.kernel_sizes, config.head_nodes)
 
 	# Train model
-	history = model.fit(train_generator(header_files, recording_files, classes, config.Window_length, config.batch_size), 
+	history = model.fit(train_generator(train_header_files, train_recording_files, classes, config.Window_length, config.batch_size), 
 					steps_per_epoch= steps // config.epochs,
 					epochs=config.epochs, 
-					batch_size=config.batch_size, 
+					batch_size=config.batch_size,
+					validation_data=train_generator(val_header_files, val_recording_files, classes, config.Window_length, config.batch_size),
+					validation_steps=len(val_header_files)//config.batch_size,
 					callbacks=cbs)
+
+	#############################################
+	print('Calculating Thresholds')
+	predictions = []
+	labels = []
+	num_val = len(val_recording_files)
+	# Loop through all validation set and calculate predictions (probabilities)
+	# This code block is similar to in test_model.py
+	for i in range(num_val//10):
+		print('    {}/{}...'.format(i+1, num_val//10))
+
+        # Load header and recording.
+        header = load_header(val_header_files[i])
+        recording = load_recording(val_recording_files[i])
+        leads = get_leads(header)
+
+        # Apply model to recording.
+        if all(lead in leads for lead in twelve_leads):
+            _, _, probabilities = run_twelve_lead_model(twelve_lead_model, header, recording)
+
+        predictions.append(probabilities)
+
+        label = one_hot_encode_labels(header, classes)
+        labels.append(label)
+
+	# Use probabilities to find classwise thresholds
+	thresholds = find_thresholds(np.array(labels), np.array(predictions))
+	config.thresholds = thresholds
 
 	# Save model
 	filename = os.path.join(model_directory, twelve_lead_model_filename)
 	model.save_weights(filename)
 	save_object(config, filename+'Config.pkl')
-
-	# Train models
-
-
-	### Adapt this section to only train the number of leads we want rather than all 4 models every time
-	# Train 12-lead ECG model.
-	# print('Training 12-lead ECG model...')
-
-	# leads = twelve_leads
-	# filename = os.path.join(model_directory, twelve_lead_model_filename)
-
-	# # Chooses which values of data to use where [12, 13] are age and sex
-	# # Feed this into generator for extracting correct leads
-	# # Will also need to ensure that when loading recording that leads are in correct order
-	# feature_indices = [twelve_leads.index(lead) for lead in leads] + [12, 13]
-	# features = data[:, feature_indices]
-
-	# imputer = SimpleImputer().fit(features)
-	# features = imputer.transform(features)
-	# classifier = RandomForestClassifier(n_estimators=n_estimators, max_leaf_nodes=max_leaf_nodes, random_state=random_state).fit(features, labels)
-	# #### Need to investigate this function
-	# save_model(filename, classes, leads, imputer, classifier)
-
 
 
 ################################################################################
@@ -168,13 +169,12 @@ def load_two_lead_model(model_directory):
 
 # Generic function for loading a model.
 def load_model(filename):
+	# Load config file, create fresh model, load weights into model
 	config = load_object(filename+'Config.pkl')
-	input_shape = [config.Window_length, 12]
-	lap = 0.5
-	model = Build_InceptionTime(input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
-								config.Window_length, lap, config.filters, config.kernel_sizes, config.head_nodes)
+	model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, 
+								config.loss_func, config.Window_length, config.lap, config.filters, config.kernel_sizes, config.head_nodes)
 	model.load_weights(filename)
-	return model
+	return (model, config)
 
 ################################################################################
 #
@@ -202,7 +202,14 @@ def run_two_lead_model(model, header, recording):
 ## Change this to accept a single recording 
 ## Classes should use my function get_classes()
 def run_model(model, header, recording):
+	# Unpack model
+
+	## FIX LEADS FROM CONFIG TOO
+	model, config = model
+	thresholds = config.thresholds
+
 	# Preprocess recording
+	_, _, recording = get_features(header, recording, config.leads)
 	recording = np.swapaxes(recording, 0, 1)    # Needs to be of form (num_samples, num_channels)
 	# Get sampling data from header
 	frequency = get_frequency(header)
@@ -211,64 +218,27 @@ def run_model(model, header, recording):
 	recording = downsample_recording(recording, frequency, num_samples)
 	recording = np.expand_dims(recording, 0)    # Needs to be of form (num_recordings, num_samples, num_channels)
 
-	classes, _ = get_classes()
-
 	# Predict
-	outputs = model.compute_predictions(recording)
+	outputs = model.compute_predictions(recording)[0] # Only a single prediction (opposite of above)
 
 	# Predict labels and probabilities.
-	thresh = 0.4        # Could find better thresholds and load them above from the model directory by appending 'benchmarks' to the end of filename
-	labels = np.where(outputs > thresh, 1, 0)
-	labels = list(labels[0])
+	labels = [0]*config.num_classes
+	for i in range(config.num_classes):
+		if outputs[i] > thresholds[i]:
+			labels[i] = 1
 
-	probabilities = list(np.array(outputs[0]))
+	probabilities = list(np.array(outputs))
 
 	# Remove normal label if other problems found
-	normal_class = '426783006'
-	norm_idx = classes.index(normal_class)
-	if labels[norm_idx] == 1 and sum(labels) > 1:
-		labels[norm_idx] == 0
+	# normal_class = '426783006'
+	# norm_idx = classes.index(normal_class)
+	# if labels[norm_idx] == 1 and sum(labels) > 1:
+	# 	labels[norm_idx] == 0
 
-
-	return classes, labels, probabilities
+	return config.classes, labels, probabilities
 
 ################################################################################
 #
 # Other functions
 #
 ################################################################################
-
-# Extract features from the header and recording.
-### Can use age and sex extraction from this but dont want the final rms part
-def get_features(header, recording, leads, preprocessing=False):
-	# Extract age.
-	age = get_age(header)
-	if age is None:
-		age = float('nan')
-
-	# Extract sex. Encode as 0 for female, 1 for male, and NaN for other.
-	sex = get_sex(header)
-	if sex in ('Female', 'female', 'F', 'f'):
-		sex = 0
-	elif sex in ('Male', 'male', 'M', 'm'):
-		sex = 1
-	else:
-		sex = float('nan')
-
-	# Reorder/reselect leads in recordings.
-	available_leads = get_leads(header)
-	indices = list()
-	for lead in leads:
-		i = available_leads.index(lead)
-		indices.append(i)
-	recording = recording[indices, :]
-
-	# Pre-process recordings.
-	if preprocessing:
-		adc_gains = get_adcgains(header, leads)
-		baselines = get_baselines(header, leads)
-		num_leads = len(leads)
-		for i in range(num_leads):
-			recording[i, :] = (recording[i, :] - baselines[i]) / adc_gains[i]
-
-	return age, sex, recording
