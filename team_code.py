@@ -49,7 +49,7 @@ def training_code(data_directory, model_directory):
 	config.leads = twelve_leads
 	config.num_leads = len(config.leads)
 	config.num_modules = 6 # 6
-	config.epochs = 10 # PTB-XL = 50
+	config.epochs = 1 # PTB-XL = 50
 	config.lr = 3e-3  # 1e-2
 	config.batch_size = 128  # PTB-XL = 128
 	config.ctype = 'subdiagnostic'
@@ -95,6 +95,8 @@ def training_code(data_directory, model_directory):
 	predictions = []
 	labels = []
 	num_val = len(val_recording_files)
+	# Package model
+	model = (model, config)
 	# Loop through all validation set and calculate predictions (probabilities)
 	# This code block is similar to in test_model.py
 	for i in range(num_val//10):
@@ -107,7 +109,7 @@ def training_code(data_directory, model_directory):
 
 		# Apply model to recording.
 		if all(lead in leads for lead in twelve_leads):
-			_, _, probabilities = run_twelve_lead_model(twelve_lead_model, header, recording)
+			_, _, probabilities = run_twelve_lead_model(model, header, recording)
 
 		predictions.append(probabilities)
 
