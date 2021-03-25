@@ -100,19 +100,19 @@ def training_code(data_directory, model_directory):
 	for i in range(num_val//10):
 		print('    {}/{}...'.format(i+1, num_val//10))
 
-        # Load header and recording.
-        header = load_header(val_header_files[i])
-        recording = load_recording(val_recording_files[i])
-        leads = get_leads(header)
+		# Load header and recording.
+		header = load_header(val_header_files[i])
+		recording = load_recording(val_recording_files[i])
+		leads = get_leads(header)
 
-        # Apply model to recording.
-        if all(lead in leads for lead in twelve_leads):
-            _, _, probabilities = run_twelve_lead_model(twelve_lead_model, header, recording)
+		# Apply model to recording.
+		if all(lead in leads for lead in twelve_leads):
+			_, _, probabilities = run_twelve_lead_model(twelve_lead_model, header, recording)
 
-        predictions.append(probabilities)
+		predictions.append(probabilities)
 
-        label = one_hot_encode_labels(header, classes)
-        labels.append(label)
+		label = one_hot_encode_labels(header, classes)
+		labels.append(label)
 
 	# Use probabilities to find classwise thresholds
 	thresholds = find_thresholds(np.array(labels), np.array(predictions))
@@ -132,12 +132,12 @@ def training_code(data_directory, model_directory):
 
 # I created these 2 functions
 def save_object(obj, filename):
-    with open(filename, 'wb') as output:  # Overwrites any existing file.
-        dill.dump(obj, output)
+	with open(filename, 'wb') as output:  # Overwrites any existing file.
+		dill.dump(obj, output)
 
 def load_object(filename):
-    with open(filename, 'rb') as file:  # Overwrites any existing file.
-        return dill.load(file)
+	with open(filename, 'rb') as file:  # Overwrites any existing file.
+		return dill.load(file)
 
 
 # Save your trained models.
