@@ -5,7 +5,7 @@
 
 import dill
 from helper_code import *
-import numpy as np, os, sys, joblib
+import numpy as np, os, sys
 import tensorflow as tf
 from model_funcs import *
 from data_funcs import *
@@ -15,6 +15,9 @@ twelve_lead_model_filename = '12_lead_model'
 six_lead_model_filename = '6_lead_model'
 three_lead_model_filename = '3_lead_model'
 two_lead_model_filename = '2_lead_model'
+model_filenames = (twelve_lead_model_filename, six_lead_model_filename, three_lead_model_filename, two_lead_model_filename)
+lead_configurations = (twelve_leads, six_leads, three_leads, two_leads)	# Defined in helper_code.py
+
 
 ################################################################################
 #
@@ -37,93 +40,83 @@ def training_code(data_directory, model_directory):
 	print('Extracting features and labels...')
 	# In the real submission all training files are in a single folder
 	header_files, recording_files = find_challenge_files(data_directory)
-	train_header_files, train_recording_files, val_header_files, val_recording_files = train_val_split(header_files, recording_files, 0.05)
+	train_header_files, train_recording_files, val_header_files, val_recording_files = train_val_split(header_files, recording_files, config.val_split)
 
 	num_recordings = len(recording_files)
 	print(num_recordings, 'Files found')
+	print(len(train_recording_files), 'for training; ', len(val_recording_files), 'for threshold calculation')
 	if not num_recordings:
 		raise Exception('No data within:', data_directory.split('/')[-1])
 
-	# Load model configuration file
-	config = Config_file()
-	config.leads = twelve_leads
-	config.num_leads = len(config.leads)
-	config.num_modules = 6 # 6
-	config.epochs = 50 # PTB-XL = 50
-	config.lr = 3e-3  # 1e-2
-	config.batch_size = 128  # PTB-XL = 128
-	config.ctype = 'subdiagnostic'
-	config.optimizer='AdamWeightDecay'
-	config.wd = 1e-2 # Float
-	config.Window_length = 125 # 250
-	config.loss_func = 'BC'   # BC Or F1
-	config.SpE = 1 # 1
-	config.filters = 64
-	config.kernel_sizes = [9, 23, 49]
-	config.head_nodes = 2048
-	config.num_classes = num_classes
+	# Model configuration file defined in model_funcs.py
 	config.classes = classes
-	config.lap = 0.5
-	config.input_shape = [config.Window_length, config.num_leads]
-	config.thresholds = [0.5]*num_classes
+	config.num_classes = num_classes
 
-	
-	
-
+	# Callback function same for all models
 	cbs = []
-	# cbs.append(WandbCallback())
-	# LR Schedule callback 
-	steps = config.SpE * np.ceil(len(recording_files) / config.batch_size) * config.epochs
+	steps = config.SpE * np.ceil(len(train_recording_files) / config.batch_size) * config.epochs
 	lr_schedule = OneCycleScheduler(config.lr, steps, wd=config.wd, mom_min=0.85, mom_max=0.95)
 	cbs.append(lr_schedule)
 		
-	# Build Model
-	model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
-								config.Window_length, config.lap, config.filters, config.kernel_sizes, config.head_nodes)
+	#############
+	# Loop through each  model and train
+	############
+	for model_leads,  model_filename in zip(lead_configurations, model_filenames):
+		print('Training', model_filename)
+		print(model_leads)
+		# Add lead-specific model configurations
+		config.leads = model_leads
+		config.num_leads = len(config.leads)
+		config.input_shape = [config.Window_length, config.num_leads]
+		config.thresholds = [0.5]*num_classes	# Reset this
 
-	# Train model
-	history = model.fit(train_generator(train_header_files, train_recording_files, classes, config.Window_length, config.batch_size), 
-					steps_per_epoch= steps // config.epochs,
-					epochs=config.epochs, 
-					batch_size=config.batch_size,
-					validation_data=train_generator(val_header_files, val_recording_files, classes, config.Window_length, config.batch_size),
-					validation_steps=len(val_header_files)//config.batch_size,
-					callbacks=cbs)
+		# Build Model
+		model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
+									config.Window_length, config.lap, config.filters, config.kernel_sizes, config.head_nodes)
 
-	#############################################
-	print('Calculating Thresholds')
-	predictions = []
-	labels = []
-	num_val = len(val_recording_files)
-	# Package model
-	val_model = (model, config)
-	# Loop through all validation set and calculate predictions (probabilities)
-	# This code block is similar to in test_model.py
-	for i in range(num_val):
-		print('    {}/{}...'.format(i+1, num_val))
+		# Train model
+		history = model.fit(train_generator(train_header_files, train_recording_files, config), 
+						steps_per_epoch= steps // config.epochs,
+						epochs=config.epochs, 
+						batch_size=config.batch_size,
+						validation_data=train_generator(val_header_files, val_recording_files, config),
+						validation_steps=len(val_header_files)//config.batch_size,
+						callbacks=cbs)
 
-		# Load header and recording.
-		header = load_header(val_header_files[i])
-		recording = load_recording(val_recording_files[i])
-		leads = get_leads(header)
+		#############################################
+		print('Calculating Thresholds')
+		predictions = []
+		labels = []
+		num_val = len(val_recording_files)
+		# Package model
+		val_model = (model, config)
+		# Loop through all validation set and calculate predictions (probabilities)
+		# This code block is similar to in test_model.py
+		for i in range(num_val):
+			print('    {}/{}...'.format(i+1, num_val))
 
-		# Apply model to recording.
-		if all(lead in leads for lead in twelve_leads):
-			_, _, probabilities = run_twelve_lead_model(val_model, header, recording)
+			# Load header and recording.
+			header = load_header(val_header_files[i])
+			recording = load_recording(val_recording_files[i])
+			leads = get_leads(header)
 
-		predictions.append(probabilities)
+			# Apply model to recording.
+			if all(lead in leads for lead in model_leads):
+				_, _, probabilities = run_model(val_model, header, recording)
 
-		label = one_hot_encode_labels(header, classes)
-		labels.append(label)
+			predictions.append(probabilities)
 
-	# Use probabilities to find classwise thresholds
-	thresholds = find_thresholds(np.array(labels), np.array(predictions))
-	config.thresholds = thresholds
+			label = one_hot_encode_labels(header, classes)
+			labels.append(label)
 
-	# Save model
-	filename = os.path.join(model_directory, twelve_lead_model_filename)
-	model.save_weights(filename)
-	save_object(config, filename+'Config.pkl')
+		# Use probabilities to find classwise thresholds
+		thresholds = find_thresholds(np.array(labels), np.array(predictions))
+		config.thresholds = thresholds
+
+		# Save model
+		filename = os.path.join(model_directory, model_filename)
+		model.save_weights(filename)
+		save_object(config, filename+'Config.pkl')
 
 
 ################################################################################
@@ -205,8 +198,6 @@ def run_two_lead_model(model, header, recording):
 ## Classes should use my function get_classes()
 def run_model(model, header, recording):
 	# Unpack model
-
-	## FIX LEADS FROM CONFIG TOO
 	model, config = model
 	thresholds = config.thresholds
 

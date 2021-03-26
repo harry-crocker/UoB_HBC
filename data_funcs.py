@@ -5,9 +5,6 @@ from scipy import interpolate
 
 from helper_code import *
 
-# Class for empty config file
-class Config_file():
-	pass
 
 # Not used and broken
 # Files of different lengths cannot be in the same numpy array
