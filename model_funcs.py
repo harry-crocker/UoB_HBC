@@ -13,8 +13,8 @@ from data_funcs import *
 
 ######
 # TO DO LIST
-# - Modify generator to drop some leads where needed
 # - replace get_features with a since func to preprocess recording for use in generator and predictions
+# - Change find_thresh to maximise challenge score rather than F1 score
 
 ######
 # Generator functions for producing segments of ECG
