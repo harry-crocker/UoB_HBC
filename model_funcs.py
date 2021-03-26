@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow.keras.callbacks import Callback
 from tensorflow import keras
 from tensorflow.keras import layers
-import tensorflow_addons as tfa
+# import tensorflow_addons as tfa
 import transformers
 
 from helper_code import *
@@ -12,7 +12,7 @@ from data_funcs import *
 
 ######
 # TO DO LIST
-# - replace get_features with a since func to preprocess recording for use in generator and predictions
+# - replace get_features with a single func to preprocess recording for use in generator and predictions
 # - Change find_thresh to maximise challenge score rather than F1 score
 
 ######
@@ -355,13 +355,13 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 		optimizer = transformers.AdamWeightDecay(learning_rate=learning_rate, weight_decay_rate=wd )#, beta_2=0.99, epsilon=1e-5)
 	
 	# # Metrics
-	lr_metric = get_lr_metric(optimizer)
-	auroc = tf.keras.metrics.AUC()
-	F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
+	# lr_metric = get_lr_metric(optimizer)
+	# auroc = tf.keras.metrics.AUC()
+	# F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
 	
 	model.compile(loss=loss, 
 				  optimizer=optimizer,
-				  metrics=['accuracy', auroc, F1, lr_metric])
+				  metrics=['accuracy'])#, auroc, F1, lr_metric])
 
 	return model
 
@@ -400,7 +400,7 @@ class Config_file():
 # Create all configuration files
 config = Config_file()
 config.num_modules = 6 # 6
-config.epochs = 5 # PTB-XL = 50
+config.epochs = 1 # PTB-XL = 50
 config.lr = 3e-3  # 1e-2
 config.batch_size = 128  # PTB-XL = 128
 config.optimizer='AdamWeightDecay'
@@ -409,9 +409,9 @@ config.Window_length = 250 # 250
 config.lap = 0.5
 config.loss_func = 'BC'   # BC Or F1
 config.SpE = 1 # 1
-config.filters = 32
+config.filters = 8
 config.kernel_sizes = [5, 9, 17]# [9, 23, 49]
-config.head_nodes = 2048
+config.head_nodes = 256
 config.val_split = 0.01
 
 
