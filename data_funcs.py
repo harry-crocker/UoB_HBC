@@ -117,7 +117,6 @@ def get_features(header, recording, leads, wide_features=False, preprocessing=Fa
 		age=0
 		sex=0
 
-	print(recording.shape)
 	# Reorder/reselect leads in recordings.
 	# Need to get this into training generator
 	available_leads = get_leads(header)
@@ -126,7 +125,7 @@ def get_features(header, recording, leads, wide_features=False, preprocessing=Fa
 		i = available_leads.index(lead)
 		indices.append(i)
 	recording = recording[indices, :]
-	print(recording.shape)
+
 
 	# Pre-process recordings.
 	if preprocessing:
