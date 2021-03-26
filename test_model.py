@@ -41,7 +41,7 @@ def test_model(model_directory, data_directory, output_directory):
         leads = get_leads(header)
 
         # Apply model to recording.
-        if all(lead in leads for lead in twelve_leads):
+        if not all(lead in leads for lead in twelve_leads):
             classes, labels, probabilities = run_twelve_lead_model(twelve_lead_model, header, recording)
         elif all(lead in leads for lead in six_leads):
             classes, labels, probabilities = run_six_lead_model(six_lead_model, header, recording)
