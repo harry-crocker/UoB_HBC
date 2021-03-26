@@ -4,9 +4,10 @@
 # Some functions are *required*, but you can edit most parts of required functions, remove non-required functions, and add your own function.
 
 import dill
-from helper_code import *
 import numpy as np, os, sys
 import tensorflow as tf
+
+from helper_code import *
 from model_funcs import *
 from data_funcs import *
 
