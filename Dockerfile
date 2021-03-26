@@ -1,5 +1,5 @@
 # FROM python:3.8.6-stretch
-FROM tensorflow
+FROM tensorflow/tensorflow
 
 ## The MAINTAINER instruction sets the author field of the generated images.
 MAINTAINER author@example.com
