@@ -43,9 +43,9 @@ def test_model(model_directory, data_directory, output_directory):
         # Apply model to recording.
         if all(lead in leads for lead in twelve_leads) and False:
             classes, labels, probabilities = run_twelve_lead_model(twelve_lead_model, header, recording)
-        elif all(lead in leads for lead in six_leads):
+        elif all(lead in leads for lead in six_leads) and False:
             classes, labels, probabilities = run_six_lead_model(six_lead_model, header, recording)
-        elif all(lead in leads for lead in three_leads):
+        elif all(lead in leads for lead in three_leads) and False:
             classes, labels, probabilities = run_three_lead_model(three_lead_model, header, recording)
         elif all(lead in leads for lead in two_leads):
             classes, labels, probabilities = run_two_lead_model(two_lead_model, header, recording)
