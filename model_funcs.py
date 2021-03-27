@@ -6,6 +6,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import tensorflow_addons as tfa
 import transformers
+import wandb
 
 from helper_code import *
 from data_funcs import *
@@ -399,19 +400,22 @@ class Config_file():
 
 
 # Create all configuration files
-config = Config_file()
+run = wandb.init(project='6LeadTuning')
+config = wandb.config
+
+# config = Config_file()
 config.num_modules = 6 # 6
 config.epochs = 50 # PTB-XL = 50
 config.lr = 3e-3  # 1e-2
 config.batch_size = 128  # PTB-XL = 128
 config.optimizer='AdamWeightDecay'
 config.wd = 1e-2 # Float
-config.Window_length = 250 # 250
+config.Window_length = 125 # 250
 config.lap = 0.5
 config.loss_func = 'BC'   # BC Or F1
 config.SpE = 1 # 1
 config.filters = 64
-config.kernel_sizes = [9, 23, 49]
+config.kernel_sizes = [3, 7, 13] #[9, 23, 49]
 config.head_nodes = 2048
 config.val_split = 0.05
 

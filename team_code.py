@@ -11,6 +11,9 @@ from helper_code import *
 from model_funcs import *
 from data_funcs import *
 
+import wandb
+from wandb.keras import WandbCallback
+
 # To change when found save model
 twelve_lead_model_filename = '12_lead_model'
 six_lead_model_filename = '6_lead_model'
@@ -56,6 +59,7 @@ def training_code(data_directory, model_directory):
 
 	# Callback function same for all models
 	cbs = []
+	cbs.append(WandbCallback()) ####################
 	steps = config.SpE * np.ceil(len(train_recording_files) / config.batch_size) * config.epochs
 	lr_schedule = OneCycleScheduler(config.lr, steps, wd=config.wd, mom_min=0.85, mom_max=0.95)
 	cbs.append(lr_schedule)
