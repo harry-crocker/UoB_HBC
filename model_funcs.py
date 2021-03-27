@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow.keras.callbacks import Callback
 from tensorflow import keras
 from tensorflow.keras import layers
-# import tensorflow_addons as tfa
+import tensorflow_addons as tfa
 import transformers
 
 from helper_code import *
@@ -80,7 +80,6 @@ def train_generator(header_files, recording_files, config):
 
 # Callback functions
 class CosineAnnealer:
-	
 	def __init__(self, start, end, steps):
 		self.start = start
 		self.end = end
@@ -409,7 +408,7 @@ config.Window_length = 250 # 250
 config.lap = 0.5
 config.loss_func = 'BC'   # BC Or F1
 config.SpE = 1 # 1
-config.filters = 128
+config.filters = 64
 config.kernel_sizes = [9, 23, 49]
 config.head_nodes = 2048
 config.val_split = 0.05

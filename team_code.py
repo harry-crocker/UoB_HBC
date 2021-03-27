@@ -19,7 +19,8 @@ two_lead_model_filename = '2_lead_model'
 model_filenames = (twelve_lead_model_filename, six_lead_model_filename, three_lead_model_filename, two_lead_model_filename)
 lead_configurations = (twelve_leads, six_leads, three_leads, two_leads)	# Defined in helper_code.py
 
-
+model_filenames = (six_lead_model_filename)
+lead_configurations = (six_leads)
 ################################################################################
 #
 # Training function
@@ -80,8 +81,8 @@ def training_code(data_directory, model_directory):
 						steps_per_epoch= steps // config.epochs,
 						epochs=config.epochs, 
 						batch_size=config.batch_size,
-						# validation_data=train_generator(val_header_files, val_recording_files, config),
-						# validation_steps=len(val_header_files)//config.batch_size,
+						validation_data=train_generator(val_header_files, val_recording_files, config),
+						validation_steps=len(val_header_files)//config.batch_size,
 						callbacks=cbs)
 
 		#############################################
