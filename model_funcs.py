@@ -6,7 +6,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 # import tensorflow_addons as tfa
 import transformers
-import time, sys
+# import time, sys
 
 from helper_code import *
 from data_funcs import *
@@ -18,17 +18,17 @@ from data_funcs import *
 ######
 
 # Timer function
-def update_times(times, t, idx):
-	elapsed = time.time() - t
+# def update_times(times, t, idx):
+# 	elapsed = time.time() - t
 
-	while idx + 1 > len(times):
-		times.append(0)
+# 	while idx + 1 > len(times):
+# 		times.append(0)
 
-	times[idx] += elapsed
+# 	times[idx] += elapsed
 
-	t = time.time()
+# 	t = time.time()
 
-	return times, t
+# 	return times, t
 
 
 def load_data(header_files, recording_files, config):
@@ -277,10 +277,10 @@ class CustomModel(keras.Model):
 		step = int(wind*(1-lap))
 		tidx = 0
 		while tidx <= max_start_idx:
-				segments = X[:, tidx:tidx+wind, :]
-				segment_preds = self(segments, training=False)
-				y_pred.append(segment_preds)
-				tidx += step
+			segments = X[:, tidx:tidx+wind, :]
+			segment_preds = self(segments, training=False)
+			y_pred.append(segment_preds)
+			tidx += step
 		y_pred = tf.stack(y_pred, axis=2)
 		y_pred = tf.math.reduce_max(y_pred, axis=2)
 		return y_pred
@@ -443,10 +443,10 @@ config.Window_length = 250 # 250
 config.lap = 0.5
 config.loss_func = 'BC'   # BC Or F1
 config.SpE = 1 # 1
-config.filters = 64
-config.kernel_sizes = [9, 23, 49]
+config.filters = 32
+config.kernel_sizes = [3, 9, 17] #[9, 23, 49]
 config.head_nodes = 2048
-config.val_split = 0.05
+config.val_split = 0.02
 
 
 
