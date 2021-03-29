@@ -96,7 +96,7 @@ def train_generator(header_files, recording_files, config):
 			batches += 1
 			# End of batch, output and reset
 			if batches == 100: ###########################################################
-				norm_times = 100*times/sum(times)
+				norm_times = 100*np.array(times)/sum(times)
 				print(norm_times)
 			retX = np.array(inputs)
 			rety = np.array(targets)
