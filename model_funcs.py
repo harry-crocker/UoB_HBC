@@ -15,7 +15,6 @@ from data_funcs import *
 # TO DO LIST
 # - replace get_features with a single func to preprocess recording for use in generator and predictions
 # - Change find_thresh to maximise challenge score rather than F1 score
-
 ######
 
 # Timer function
@@ -57,7 +56,7 @@ def load_data(header_files, recording_files, config):
 		header_list.append(header)
 		labels_list.append(labels)
 		recording_list.append(recording)
-		if i % 100 ==1:
+		if i % 1000 ==1:
 			print(i, '/', len(recording_files), '   Size:', sys.getsizeof(recording_list)/1e6)
 
 	return header_list, labels_list, recording_list, ecg_lengths
@@ -463,7 +462,7 @@ config.SpE = 1 # 1
 config.filters = 64
 config.kernel_sizes = [9, 23, 49]
 config.head_nodes = 2048
-config.val_split = 0.95
+config.val_split = 0.05
 
 
 
