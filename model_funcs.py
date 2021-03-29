@@ -6,6 +6,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 # import tensorflow_addons as tfa
 import transformers
+import time
 
 from helper_code import *
 from data_funcs import *
@@ -16,6 +17,23 @@ from data_funcs import *
 # - Change find_thresh to maximise challenge score rather than F1 score
 
 ######
+
+# Timer function
+def update_times(times, t, idx):
+	elapsed = time.time() - t
+
+	while idx + 1 > len(times):
+		times.append(0)
+
+	times[idx] += elapsed
+
+	t = time.time()
+
+	return times, t
+
+
+
+
 # Generator functions for producing segments of ECG
 def train_generator(header_files, recording_files, config):
 	wind = config.Window_length
@@ -28,16 +46,20 @@ def train_generator(header_files, recording_files, config):
 	bc = 0  # Batch count increments after every recording
 	# Select ecgs indexes for this batch
 	file_idxs = np.random.randint(0, num_recordings, size=bs)
+	batches=0 ###########################################################
 	
 	while True:
+		t = time.time()
 		# Get the current ecg index
 		file_idx = file_idxs[bc]
 
 		# Load the full recording and header 
 		header = load_header(header_files[file_idx])
 		recording = load_recording(recording_files[file_idx])
+		times, t = update_times(times, t, 0) #####################################################################################
 		_, _, recording = get_features(header, recording, config.leads)
 		recording = np.swapaxes(recording, 0, 1)    # Needs to be of form (num_samples, num_channels)
+		times, t = update_times(times, t, 1) #####################################################################################
 
 		# Get class labels from header
 		labels = one_hot_encode_labels(header, config.classes)
@@ -49,12 +71,14 @@ def train_generator(header_files, recording_files, config):
 			continue
 		targets.append(labels)
 
+		times, t = update_times(times, t, 2) #####################################################################################
 		# Get sampling data from header
 		frequency = get_frequency(header)
 		num_samples = get_num_samples(header)
 
 		# Downsample the recording
 		recording = downsample_recording(recording, frequency, num_samples)
+		times, t = update_times(times, t, 3) #####################################################################################
 
 		# Get segement start time
 		max_start_idx = recording.shape[0] - wind
@@ -63,10 +87,16 @@ def train_generator(header_files, recording_files, config):
 		# Get the segment and append to list
 		segment = recording[t_idx:t_idx+wind]  
 		inputs.append(segment)
+
+		times, t = update_times(times, t, 4) #####################################################################################
 		
 		bc += 1
 		if bc >= bs:
+			batches += 1
 			# End of batch, output and reset
+			if batches == 100: ###########################################################
+				norm_times = 100*times/sum(times)
+				print(norm_times)
 			retX = np.array(inputs)
 			rety = np.array(targets)
 			yield (retX, rety)
