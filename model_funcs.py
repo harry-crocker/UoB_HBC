@@ -39,8 +39,8 @@ def load_data(header_files, recording_files, config):
 	ecg_lengths = []
 	for i, (header_file, recording_file) in enumerate(zip(header_files, recording_files)):
 		# Load from file
-		header = load_header(header_files[file_idx])
-		recording = load_recording(recording_files[file_idx])
+		header = load_header(header_file)
+		recording = load_recording(recording_file)
 		# Preprocess recording
 		_, _, recording = get_features(header, recording, config.leads)	# Extract leads
 		recording = np.swapaxes(recording, 0, 1)    # Needs to be of form (num_samples, num_channels)
