@@ -47,6 +47,7 @@ def train_generator(header_files, recording_files, config):
 	# Select ecgs indexes for this batch
 	file_idxs = np.random.randint(0, num_recordings, size=bs)
 	batches=0 ###########################################################
+	times=[]
 	
 	while True:
 		t = time.time()
