@@ -98,12 +98,13 @@ def train_generator(header_files, recording_files, config):
 
 		times, t = update_times(times, t, 1) #####################################################################################
 
-		# Get segement start time
+		# Get segement 
 		max_start_idx = recording.shape[0] - wind
 		t_idx = np.random.randint(0, max_start_idx)
-		# Get the segment and append to list
-		segment = recording[t_idx:t_idx+wind]  
+		segment = recording[t_idx:t_idx+wind] 
+		# Append outputs to list 
 		inputs.append(segment)
+		targets.append(labels)
 
 		times, t = update_times(times, t, 2) #####################################################################################
 		
