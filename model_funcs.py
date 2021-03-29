@@ -107,8 +107,8 @@ def train_generator(header_files, recording_files, config):
 			bc = 0  # Batch count increments after every recording
 			# Select ecgs indexes for this batch
 			file_idxs = np.random.randint(0, num_recordings, size=bs)
-
-
+			batches=0
+		times, t = update_times(times, t, 5) #####################################################################################
 # Callback functions
 class CosineAnnealer:
 	
