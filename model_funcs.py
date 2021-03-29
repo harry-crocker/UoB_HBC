@@ -101,7 +101,6 @@ def train_generator(header_files, recording_files, config):
 		
 		bc += 1
 		if bc >= bs:
-			batches += 1
 			# End of batch, output and reset
 			retX = np.array(inputs)
 			rety = np.array(targets)
