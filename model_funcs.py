@@ -85,8 +85,8 @@ def train_generator(header_files, recording_files, config):
 		file_idx = file_idxs[bc]
 		# Get data from list
 		# header = header_list[]
-		labels = labels_list[]
-		recording = recording_list[]
+		labels = labels_list[file_idx]
+		recording = recording_list[file_idx]
 		times, t = update_times(times, t, 0) #####################################################################################
 		# Check if suitable sample
 		if np.sum(labels) == 0:
