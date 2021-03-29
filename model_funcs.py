@@ -56,8 +56,8 @@ def load_data(header_files, recording_files, config):
 		header_list.append(header)
 		labels_list.append(labels)
 		recording_list.append(recording)
-		if i % 1000 ==1:
-			print(i, '/', len(recording_files), '   Size:', sys.getsizeof(recording_list)/1e6)
+		# if i % 1000 ==1:
+			# print(i, '/', len(recording_files), '   Size:', sys.getsizeof(recording_list)/1e6)
 
 	return header_list, labels_list, recording_list, ecg_lengths
 
@@ -447,7 +447,6 @@ config.filters = 64
 config.kernel_sizes = [9, 23, 49]
 config.head_nodes = 2048
 config.val_split = 0.05
-
 
 
 
