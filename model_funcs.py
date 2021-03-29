@@ -98,6 +98,7 @@ def train_generator(header_files, recording_files, config):
 			if batches == 100: ###########################################################
 				norm_times = 100*np.array(times)/sum(times)
 				print(norm_times)
+				batches=0
 			retX = np.array(inputs)
 			rety = np.array(targets)
 			yield (retX, rety)
@@ -107,7 +108,7 @@ def train_generator(header_files, recording_files, config):
 			bc = 0  # Batch count increments after every recording
 			# Select ecgs indexes for this batch
 			file_idxs = np.random.randint(0, num_recordings, size=bs)
-			batches=0
+
 		times, t = update_times(times, t, 5) #####################################################################################
 # Callback functions
 class CosineAnnealer:
