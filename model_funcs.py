@@ -75,18 +75,14 @@ def train_generator(header_files, recording_files, config):
 	bc = 0  # Batch count increments after every recording
 	# Select ecgs indexes for this batch
 	file_idxs = np.random.choice(range(num_recordings), size=bs, p=probs)
-	batches=0 ###########################################################
-	times=[]
 	
 	while True:
-		t = time.time()
 		# Get the current ecg index
 		file_idx = file_idxs[bc]
 		# Get data from list
 		# header = header_list[]
 		labels = labels_list[file_idx]
 		recording = recording_list[file_idx]
-		times, t = update_times(times, t, 0) #####################################################################################
 		# Check if suitable sample
 		if np.sum(labels) == 0:
 			# Labels are not in classes so not an appropriate ecg for training
@@ -95,8 +91,6 @@ def train_generator(header_files, recording_files, config):
 			file_idxs[bc] = np.random.randint(0, num_recordings)
 			continue
 
-		times, t = update_times(times, t, 1) #####################################################################################
-
 		# Get segement 
 		max_start_idx = recording.shape[0] - wind
 		t_idx = np.random.randint(0, max_start_idx)
@@ -104,17 +98,11 @@ def train_generator(header_files, recording_files, config):
 		# Append outputs to list 
 		inputs.append(segment)
 		targets.append(labels)
-
-		times, t = update_times(times, t, 2) #####################################################################################
 		
 		bc += 1
 		if bc >= bs:
 			batches += 1
 			# End of batch, output and reset
-			if batches == config.batch_size: ###########################################################
-				norm_times = 100*np.array(times)/sum(times)
-				print(norm_times)
-				batches=0
 			retX = np.array(inputs)
 			rety = np.array(targets)
 			yield (retX, rety)
@@ -124,8 +112,6 @@ def train_generator(header_files, recording_files, config):
 			bc = 0  # Batch count increments after every recording
 			# Select ecgs indexes for this batch
 			file_idxs = np.random.choice(range(num_recordings), size=bs, p=probs)
-
-		times, t = update_times(times, t, 3) #####################################################################################
 
 # Callback functions
 class CosineAnnealer:
