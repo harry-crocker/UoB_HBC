@@ -117,7 +117,6 @@ def train_generator(header_files, recording_files, config):
 				batches=0
 			retX = np.array(inputs)
 			rety = np.array(targets)
-			print(retX.shape, rety.shape)
 			yield (retX, rety)
 			# Generator will resume here after yield
 			inputs = []
