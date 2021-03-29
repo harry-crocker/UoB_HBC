@@ -84,12 +84,12 @@ def train_generator(header_files, recording_files, config):
 		labels = labels_list[file_idx]
 		recording = recording_list[file_idx]
 		# Check if suitable sample
-		if np.sum(labels) == 0:
-			# Labels are not in classes so not an appropriate ecg for training
-			# Continue will skip
-			# Set file index to a new random value else the same ecg will be reselected forever
-			file_idxs[bc] = np.random.randint(0, num_recordings)
-			continue
+		# if np.sum(labels) == 0:
+		# 	# Labels are not in classes so not an appropriate ecg for training
+		# 	# Continue will skip
+		# 	# Set file index to a new random value else the same ecg will be reselected forever
+		# 	file_idxs[bc] = np.random.randint(0, num_recordings)
+		# 	continue
 
 		# Get segement 
 		max_start_idx = recording.shape[0] - wind
