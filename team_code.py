@@ -19,6 +19,7 @@ two_lead_model_filename = '2_lead_model'
 model_filenames = (twelve_lead_model_filename, six_lead_model_filename, three_lead_model_filename, two_lead_model_filename)
 lead_configurations = (twelve_leads, six_leads, three_leads, two_leads)	# Defined in helper_code.py
 
+os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices'
 
 ################################################################################
 #
