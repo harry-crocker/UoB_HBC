@@ -117,6 +117,7 @@ def train_generator(header_files, recording_files, config):
 				batches=0
 			retX = np.array(inputs)
 			rety = np.array(targets)
+			print(retX.shape, rety.shape)
 			yield (retX, rety)
 			# Generator will resume here after yield
 			inputs = []
@@ -461,7 +462,7 @@ config.SpE = 1 # 1
 config.filters = 64
 config.kernel_sizes = [9, 23, 49]
 config.head_nodes = 2048
-config.val_split = 0.05
+config.val_split = 0.95
 
 
 
