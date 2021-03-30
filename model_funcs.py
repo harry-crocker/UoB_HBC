@@ -17,19 +17,6 @@ from data_funcs import *
 # - Change find_thresh to maximise challenge score rather than F1 score
 ######
 
-# Timer function
-# def update_times(times, t, idx):
-# 	elapsed = time.time() - t
-
-# 	while idx + 1 > len(times):
-# 		times.append(0)
-
-# 	times[idx] += elapsed
-
-# 	t = time.time()
-
-# 	return times, t
-
 
 def load_data(header_files, recording_files, config):
 	header_list = []
