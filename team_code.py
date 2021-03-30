@@ -39,7 +39,7 @@ def training_code(data_directory, model_directory):
 	num_classes = len(classes)
 
 	# Extract features and labels from dataset.
-	print('Extracting features and labels...')
+	print('Finding Files...')
 	# In the real submission all training files are in a single folder
 	header_files, recording_files = find_challenge_files(data_directory)
 	train_header_files, train_recording_files, val_header_files, val_recording_files = train_val_split(header_files, recording_files, config.val_split)
