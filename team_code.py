@@ -66,7 +66,7 @@ def training_code(data_directory, model_directory):
 		# Import tfa in model_funcs
 		import wandb
 		from wandb.keras import WandbCallback
-		cbs.append(WandbCallback)
+		cbs.append(WandbCallback())
 		model_filenames = (two_lead_model_filename)
 		lead_configurations = (two_leads)
 		validation_data=train_generator(val_header_files, val_recording_files, config)
