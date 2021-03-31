@@ -27,6 +27,7 @@ if dev_mode:
 	import wandb
 	run = wandb.init(project='2LeadTuning')	# Also change the file names in team_code
 	config = run.config
+	# Also change metrics
 else:
 	config = Config_file()
 
@@ -407,13 +408,15 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 		optimizer = transformers.AdamWeightDecay(learning_rate=learning_rate, weight_decay_rate=wd )#, beta_2=0.99, epsilon=1e-5)
 	
 	# # Metrics
-	# lr_metric = get_lr_metric(optimizer)
-	# auroc = tf.keras.metrics.AUC()
-	# F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
+	lr_metric = get_lr_metric(optimizer)
+	auroc = tf.keras.metrics.AUC()
+	F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
 	
 	model.compile(loss=loss, 
 				  optimizer=optimizer,
-				  metrics=['accuracy'])#, auroc, F1, lr_metric])
+				  metrics=['accuracy'
+				  , auroc, F1, lr_metric
+				  ])
 
 	return model
 
