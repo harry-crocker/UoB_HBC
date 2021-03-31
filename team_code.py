@@ -128,9 +128,9 @@ def training_code(data_directory, model_directory):
 
 		# Use probabilities to find classwise thresholds
 		thresholds, best_f1 = find_thresholds(np.array(labels), np.array(predictions))
-		wandb.config.update({"thresholds": thresholds, 'best_f1': best_f1}, allow_val_change=True)
-		# config.thresholds = thresholds
-		# config.best_f1 = best_f1
+		config.thresholds = thresholds
+		config.best_f1 = best_f1
+		wandb.config.update(vars(config), allow_val_change=True)
 
 		# Save model
 		filename = os.path.join(model_directory, model_filename)

@@ -26,14 +26,12 @@ if dev_mode:
 	import tensorflow_addons as tfa
 	import wandb
 	run = wandb.init(project='2LeadTuning', allow_val_change=True)	# Also change the file names in team_code
-	config = run.config
 	# Also change metrics 
 	# Also change update thresholds
-else:
-	config = Config_file()
 
 
 # Create all configuration files
+config = Config_file()
 config.num_modules = 6 # 6
 config.epochs = 1 # PTB-XL = 50
 config.lr = 3e-3  # 1e-2
@@ -48,6 +46,8 @@ config.filters = 32
 config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
 config.head_nodes = 2048
 config.val_split = 0.001
+
+wandb.config.update(vars(config), allow_val_change=True)
 
 
 def load_data(header_files, recording_files, config):
