@@ -127,8 +127,9 @@ def training_code(data_directory, model_directory):
 			labels.append(label)
 
 		# Use probabilities to find classwise thresholds
-		thresholds = find_thresholds(np.array(labels), np.array(predictions))
+		thresholds, best_f1 = find_thresholds(np.array(labels), np.array(predictions))
 		config.thresholds = thresholds
+		config.best_f1 = best_f1
 
 		# Save model
 		filename = os.path.join(model_directory, model_filename)

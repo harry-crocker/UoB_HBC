@@ -25,7 +25,7 @@ dev_mode = True
 if dev_mode:
 	import tensorflow_addons as tfa
 	import wandb
-	run = wandb.init(project='2LeadTuning')	# Also change the file names in team_code
+	run = wandb.init(project='2LeadTuning', allow_val_change=True)	# Also change the file names in team_code
 	config = run.config
 	# Also change metrics
 else:
@@ -442,9 +442,9 @@ def find_thresholds(y_labels, y_hat):
 			if f1 > best_thresh_f1[i]:
 				best_thresh_f1[i] = f1
 				best_thresh[i] = thresh
-
-	print('F1 Score on Validation:', np.mean(best_thresh_f1))
-	return best_thresh
+	f1_score = np.mean(best_thresh_f1)
+	print('F1 Score on Validation:', f1_score)
+	return best_thresh, f1_score
 
 
 
