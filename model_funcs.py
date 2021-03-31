@@ -34,7 +34,7 @@ if dev_mode:
 config = Config_file()
 config.num_modules = 6 # 6
 config.epochs = 50 # PTB-XL = 50
-config.lr = 3e-3  # 1e-2
+config.lr = 1e-2  # 1e-2
 config.batch_size = 128  # PTB-XL = 128
 config.optimizer='AdamWeightDecay'
 config.wd = 1e-2 # Float
@@ -43,7 +43,7 @@ config.lap = 0.5
 config.loss_func = 'BC'   # BC Or F1
 config.SpE = 1 # 1
 config.filters = 64
-config.kernel_sizes = [9, 23, 49]#[3, 7, 17] #[9, 23, 49]
+config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
 config.head_nodes = 2048
 config.val_split = 0.1
 
