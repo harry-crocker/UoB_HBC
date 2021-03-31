@@ -11,6 +11,7 @@ from helper_code import *
 from model_funcs import *
 from data_funcs import *
 
+
 # To change when found save model
 twelve_lead_model_filename = '12_lead_model'
 six_lead_model_filename = '6_lead_model'
@@ -19,7 +20,6 @@ two_lead_model_filename = '2_lead_model'
 model_filenames = (twelve_lead_model_filename, six_lead_model_filename, three_lead_model_filename, two_lead_model_filename)
 lead_configurations = (twelve_leads, six_leads, three_leads, two_leads)	# Defined in helper_code.py
 
-# os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices'
 #
 ################################################################################
 #
@@ -59,6 +59,21 @@ def training_code(data_directory, model_directory):
 	steps = config.SpE * np.ceil(len(train_recording_files) / config.batch_size) * config.epochs
 	lr_schedule = OneCycleScheduler(config.lr, steps, wd=config.wd, mom_min=0.85, mom_max=0.95)
 	cbs.append(lr_schedule)
+
+	######################
+	# For development only
+	if dev_mode:
+		# Import tfa in model_funcs
+		import wandb
+		from wandb.keras import WandbCallback
+		cbs.append(WandbCallback)
+		model_filenames = (two_lead_model_filename)
+		lead_configurations = (two_leads)
+		validation_data=train_generator(val_header_files, val_recording_files, config)
+		validation_steps=len(val_header_files)//config.batch_size
+	else:
+		validation_data=None
+		validation_steps=None
 		
 	#############
 	# Loop through each  model and train
@@ -81,8 +96,8 @@ def training_code(data_directory, model_directory):
 						steps_per_epoch= steps // config.epochs,
 						epochs=config.epochs, 
 						batch_size=config.batch_size,
-						# validation_data=train_generator(val_header_files, val_recording_files, config),
-						# validation_steps=len(val_header_files)//config.batch_size,
+						validation_data=validation_data,
+						validation_steps=validation_steps,
 						callbacks=cbs)
 
 		#############################################
@@ -232,8 +247,3 @@ def run_model(model, header, recording):
 
 	return config.classes, labels, probabilities
 
-################################################################################
-#
-# Other functions
-#
-################################################################################
