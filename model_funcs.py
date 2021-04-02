@@ -39,7 +39,7 @@ config.lr = 3e-3  # 1e-2
 config.batch_size = 128  # PTB-XL = 128
 config.optimizer='AdamWeightDecay'
 config.wd = 1e-2 # Float
-config.Window_length = 250 # 250
+config.Window_length = 400 # 250
 config.lap = 0.5
 config.loss_func = 'BC'   # BC Or F1
 config.SpE = 1 # 1
