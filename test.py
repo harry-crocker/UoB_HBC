@@ -1,8 +1,2 @@
-print(1 is 1)
-
-class c():
-	pass
-
-c.age = 10
-if c.n:
-	print(True)
+equivalent_classes = {'713427006': '59118001', '284470004': '63593006', '427172004': '17338001'}
+print('713427006' in equivalent_classes.keys())

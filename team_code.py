@@ -35,8 +35,9 @@ def training_code(data_directory, model_directory):
 
 	# Extract classes from dx_mapping_scored.csv file as want to have same classes for all models
 	print('Extracting classes...')
-	classes, abb_classes = get_classes()
+	classes = get_classes()
 	num_classes = len(classes)
+	print('Number of Classes:', num_classes)
 
 	# Extract features and labels from dataset.
 	print('Finding Files...')
@@ -110,7 +111,8 @@ def training_code(data_directory, model_directory):
 		# Loop through all validation set and calculate predictions (probabilities)
 		# This code block is similar to in test_model.py
 		for i in range(num_val):
-			print('    {}/{}...'.format(i+1, num_val))
+			if i % 100 ==1:
+				print('    {}/{}...'.format(i+1, num_val))
 
 			# Load header and recording.
 			header = load_header(val_header_files[i])
