@@ -45,15 +45,24 @@ def get_classes():
 	df = pd.read_csv(path_to_classes)
 	SNOMED_CT_Codes = list(df['SNOMED CT Code'])
 	SNOMED_CT_Codes = [str(item) for item in SNOMED_CT_Codes]
-	class_abbreviations = list(df['Abbreviation'])
-	return SNOMED_CT_Codes, class_abbreviations
+	equivalent_classes = {'713427006': '59118001', '284470004': '63593006', '427172004': '17338001'}
+	# Remove one of equivalent classes
+	for label in equivalent_classes.keys():
+		SNOMED_CT_Codes.remove(label)
+		if not equivalent_classes[label] in SNOMED_CT_Codes:
+			print('Equivalent class not in classes')
+	# class_abbreviations = list(df['Abbreviation'])
+	return SNOMED_CT_Codes
 
 
 def one_hot_encode_labels(header, classes):
+	equivalent_classes = {'713427006': '59118001', '284470004': '63593006', '427172004': '17338001'}
 	num_classes = len(classes)
 	labels = np.zeros(num_classes, dtype=np.bool) # One-hot encoding of classes
 	current_labels = get_labels(header)
 	for label in current_labels:
+		if label in equivalent_classes.keys():	# Remove one of equivalent classes
+			label = equivalent_classes[label]
 		if label in classes:
 			j = classes.index(label)
 			labels[j] = 1

@@ -71,6 +71,7 @@ def training_code(data_directory, model_directory):
 		config.num_leads = len(config.leads)
 		config.input_shape = [config.Window_length, config.num_leads]
 		config.thresholds = [0.5]*num_classes	# Reset this
+		config.epochs = 30 + 3*config.num_leads
 
 		# Build Model
 		model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
