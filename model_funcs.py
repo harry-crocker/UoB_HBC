@@ -303,7 +303,7 @@ class CustomModel(keras.Model):
 			y_pred.append(segment_preds)
 			tidx += step
 		y_pred = tf.stack(y_pred, axis=2)
-		y_pred = tf.math.reduce_max(y_pred, axis=2)
+		y_pred = tf.math.reduce_max(y_pred, axis=2)fi
 		return y_pred
 	
 
