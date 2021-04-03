@@ -53,12 +53,6 @@ def training_code(data_directory, model_directory):
 	# Model configuration file defined in model_funcs.py
 	config.classes = classes
 	config.num_classes = num_classes
-
-	# Callback function same for all models
-	cbs = []
-	steps = config.SpE * np.ceil(len(train_recording_files) / config.batch_size) * config.epochs
-	lr_schedule = OneCycleScheduler(config.lr, steps, wd=config.wd, mom_min=0.85, mom_max=0.95)
-	cbs.append(lr_schedule)
 		
 	#############
 	# Loop through each  model and train
@@ -72,6 +66,11 @@ def training_code(data_directory, model_directory):
 		config.input_shape = [config.Window_length, config.num_leads]
 		config.thresholds = [0.5]*num_classes	# Reset this
 		config.epochs = 30 + 3*config.num_leads
+
+		cbs = []
+		steps = config.SpE * np.ceil(len(train_recording_files) / config.batch_size) * config.epochs
+		lr_schedule = OneCycleScheduler(config.lr, steps, wd=config.wd, mom_min=0.85, mom_max=0.95)
+		cbs.append(lr_schedule)
 
 		# Build Model
 		model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
