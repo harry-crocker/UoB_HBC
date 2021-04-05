@@ -318,7 +318,7 @@ def InceptionModule(input_tensor, num_filters=32, bottleneck_size=32, activation
 	# Join the parallel branches into 1, along a new 'feature' axis bringing to 3D again
 	# axis 0 is each batch, axis 1 is time
 	x = keras.layers.Concatenate(axis=2)(conv_list)
-	x = keras.layers.BatchNormalization()(x)
+	x = keras.layers.BatchNormalization(axis=1)(x)
 	x = keras.layers.Activation(activation='relu')(x)
 	return x
 
@@ -338,7 +338,7 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 											 kernel_size=1,
 											 padding='same', 
 											 use_bias=bias)(shortcut_start)
-			shortcut = layers.BatchNormalization()(shortcut)
+			shortcut = layers.BatchNormalization(axis=1)(shortcut)
 
 			x = keras.layers.Add()([shortcut, x])
 			x = keras.layers.Activation('relu')(x)
