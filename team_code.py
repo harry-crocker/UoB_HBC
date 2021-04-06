@@ -35,7 +35,7 @@ def training_code(data_directory, model_directory):
 
 	# Extract classes from dx_mapping_scored.csv file as want to have same classes for all models
 	print('Extracting classes...')
-	classes, abb_classes = get_classes()
+	classes= get_classes()
 	num_classes = len(classes)
 
 	# Extract features and labels from dataset.
