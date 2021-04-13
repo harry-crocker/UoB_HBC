@@ -95,7 +95,8 @@ def training_code(data_directory, model_directory):
 		# Loop through all validation set and calculate predictions (probabilities)
 		# This code block is similar to in test_model.py
 		for i in range(num_val):
-			print('    {}/{}...'.format(i+1, num_val))
+			if i % 100 == 1:
+				print('    {}/{}...'.format(i+1, num_val))
 
 			# Load header and recording.
 			header = load_header(val_header_files[i])
