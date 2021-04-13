@@ -65,7 +65,7 @@ def training_code(data_directory, model_directory):
 		config.num_leads = len(config.leads)
 		config.input_shape = [config.Window_length, config.num_leads]
 		config.thresholds = [0.5]*num_classes	# Reset this
-		config.epochs = 30 + 3*config.num_leads
+		config.epochs = 50 #30 + 3*config.num_leads
 
 		cbs = []
 		steps = config.SpE * np.ceil(len(train_recording_files) / config.batch_size) * config.epochs
