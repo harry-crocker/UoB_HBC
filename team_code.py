@@ -64,6 +64,9 @@ def training_code(data_directory, model_directory):
 	# Loop through each  model and train
 	############
 	for model_leads,  model_filename in zip(lead_configurations, model_filenames):
+		if dev_mode:
+			run = wandb.init(project='FinalModels', allow_val_change=True)
+
 		print('Training', model_filename)
 		print(model_leads)
 		# Add lead-specific model configurations
@@ -102,7 +105,7 @@ def training_code(data_directory, model_directory):
 		# Loop through all validation set and calculate predictions (probabilities)
 		# This code block is similar to in test_model.py
 		for i in range(num_val):
-			if i % 100 == 1:
+			if i % 100 == 0:
 				print('    {}/{}...'.format(i+1, num_val))
 
 			# Load header and recording.
