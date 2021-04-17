@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow.keras.callbacks import Callback
 from tensorflow import keras
 from tensorflow.keras import layers
-# import tensorflow_addons as tfa
+import tensorflow_addons as tfa
 import transformers
 # import time, sys
 
@@ -18,7 +18,7 @@ from data_funcs import *
 ######
 
 
-def load_data(header_files, recording_files, config):
+def load_data(header_files, recording_files, leads, classes):
 	header_list = []
 	recording_list = []
 	labels_list = []
@@ -29,14 +29,14 @@ def load_data(header_files, recording_files, config):
 		header = load_header(header_file)
 		recording = load_recording(recording_file)
 		# Preprocess recording
-		_, _, recording = get_features(header, recording, config.leads)	# Extract leads
+		recording = correct_leads(header, recording, leads)
 		recording = np.swapaxes(recording, 0, 1)    # Needs to be of form (num_samples, num_channels)
 		# Downsample recording
 		frequency = get_frequency(header)
 		num_samples = get_num_samples(header)
 		recording = downsample_recording(recording, frequency, num_samples)
 		# Get labels
-		labels = one_hot_encode_labels(header, config.classes)
+		labels = one_hot_encode_labels(header, classes)
 		# Get ecg length in seconds
 		ecg_len = num_samples/frequency
 		# Store in lists
@@ -45,17 +45,18 @@ def load_data(header_files, recording_files, config):
 		labels_list.append(labels)
 		recording_list.append(recording)
 		if i % 1000 ==1:
-			print(i, '/', len(recording_files)) #, '   Size:', sys.getsizeof(recording_list)/1e6)
+			print(i, '/', len(recording_files)) 
 
 	return header_list, labels_list, recording_list, ecg_lengths
 
 # Generator functions for producing segments of ECG
-def train_generator(header_files, recording_files, config):
+def train_generator(labels_list, recording_list, ecg_lengths, config, val=False):
 	wind = config.Window_length
 	bs = config.batch_size
 	num_recordings = len(recording_files)
-	header_list, labels_list, recording_list, ecg_lengths = load_data(header_files, recording_files, config)
 	probs = np.array(ecg_lengths)/np.sum(ecg_lengths)
+	if val:
+		probs=None
 
 	# Need to reset these every batch
 	inputs = []
@@ -68,21 +69,13 @@ def train_generator(header_files, recording_files, config):
 		# Get the current ecg index
 		file_idx = file_idxs[bc]
 		# Get data from list
-		# header = header_list[]
 		labels = labels_list[file_idx]
 		recording = recording_list[file_idx]
-		# Check if suitable sample
-		# if np.sum(labels) == 0:
-		# 	# Labels are not in classes so not an appropriate ecg for training
-		# 	# Continue will skip
-		# 	# Set file index to a new random value else the same ecg will be reselected forever
-		# 	file_idxs[bc] = np.random.randint(0, num_recordings)
-		# 	continue
 
 		# Get segement 
 		max_start_idx = recording.shape[0] - wind
 		t_idx = np.random.randint(0, max_start_idx)
-		segment = recording[t_idx:t_idx+wind] 
+		segment = recording[t_idx:t_idx+wind, config.lead_indexes] # SELECT LEADS HERE
 		# Append outputs to list 
 		inputs.append(segment)
 		targets.append(labels)
@@ -102,7 +95,6 @@ def train_generator(header_files, recording_files, config):
 
 # Callback functions
 class CosineAnnealer:
-	
 	def __init__(self, start, end, steps):
 		self.start = start
 		self.end = end
@@ -347,10 +339,7 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 	x1 = layers.GlobalAveragePooling1D()(x)
 	x2 = layers.GlobalMaxPooling1D()(x)
 
-	# x1 = tfa.layers.AdaptiveAveragePooling1D(10)(x)
-	# x2 = tfa.layers.AdaptiveMaxPooling1D(10)(x)
 	x = layers.Concatenate(axis=1)([x1, x2])
-	# x = layers.Flatten()(x)
 	
 	x = layers.BatchNormalization()(x)
 	x = layers.Dropout(0.25)(x)
@@ -377,13 +366,13 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 		optimizer = transformers.AdamWeightDecay(learning_rate=learning_rate, weight_decay_rate=wd )#, beta_2=0.99, epsilon=1e-5)
 	
 	# # Metrics
-	# lr_metric = get_lr_metric(optimizer)
-	# auroc = tf.keras.metrics.AUC()
-	# F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
+	lr_metric = get_lr_metric(optimizer)
+	auroc = tf.keras.metrics.AUC()
+	F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
 	
 	model.compile(loss=loss, 
 				  optimizer=optimizer,
-				  metrics=['accuracy'])#, auroc, F1, lr_metric])
+				  metrics=['accuracy', auroc, F1, lr_metric])
 
 	return model
 

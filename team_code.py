@@ -11,16 +11,18 @@ from helper_code import *
 from model_funcs import *
 from data_funcs import *
 
+import wandb
+from wandb.keras import WandbCallback
+
 # To change when found save model
 twelve_lead_model_filename = '12_lead_model'
 six_lead_model_filename = '6_lead_model'
 three_lead_model_filename = '3_lead_model'
 two_lead_model_filename = '2_lead_model'
-model_filenames = (three_lead_model_filename, two_lead_model_filename) #(twelve_lead_model_filename, six_lead_model_filename, three_lead_model_filename, two_lead_model_filename)
-lead_configurations = (three_leads, two_leads)  #(twelve_leads, six_leads, three_leads, two_leads)	# Defined in helper_code.py
+model_filenames = (twelve_lead_model_filename, six_lead_model_filename, three_lead_model_filename, two_lead_model_filename)
+lead_configurations = (twelve_leads, six_leads, three_leads, two_leads)	# Defined in helper_code.py
 
-# os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices'
-#
+
 ################################################################################
 #
 # Training function
@@ -50,6 +52,10 @@ def training_code(data_directory, model_directory):
 	if not num_recordings:
 		raise Exception('No data within:', data_directory.split('/')[-1])
 
+	# Get data
+	_, train_labels_list, train_recording_list, train_ecg_lengths = load_data(train_header_files, train_recording_files, twelve_leads, classes)
+	_, val_labels_list, val_recording_list, val_ecg_lengths = load_data(val_header_files, val_recording_files, twelve_leads, classes)
+
 	# Model configuration file defined in model_funcs.py
 	config.classes = classes
 	config.num_classes = num_classes
@@ -66,23 +72,25 @@ def training_code(data_directory, model_directory):
 		config.input_shape = [config.Window_length, config.num_leads]
 		config.thresholds = [0.5]*num_classes	# Reset this
 		config.epochs = 50 #30 + 3*config.num_leads
+		config.lead_indexes = lead_indexes(twelve_leads, config.leads)
 
 		cbs = []
 		steps = config.SpE * np.ceil(len(train_recording_files) / config.batch_size) * config.epochs
 		lr_schedule = OneCycleScheduler(config.lr, steps, wd=config.wd, mom_min=0.85, mom_max=0.95)
 		cbs.append(lr_schedule)
+		cbs.append(WandbCallback())
 
 		# Build Model
 		model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
 									config.Window_length, config.lap, config.filters, config.kernel_sizes, config.head_nodes)
 
 		# Train model
-		history = model.fit(train_generator(train_header_files, train_recording_files, config), 
+		history = model.fit(train_generator(train_labels_list, train_recording_list, train_ecg_lengths, config), 
 						steps_per_epoch= steps // config.epochs,
 						epochs=config.epochs, 
 						batch_size=config.batch_size,
-						# validation_data=train_generator(val_header_files, val_recording_files, config),
-						# validation_steps=len(val_header_files)//config.batch_size,
+						validation_data=train_generator(val_labels_list, val_recording_list, val_ecg_lengths, config, val=True),
+						validation_steps=len(val_header_files)//config.batch_size,
 						callbacks=cbs)
 
 		#############################################

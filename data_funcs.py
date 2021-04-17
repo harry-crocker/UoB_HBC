@@ -147,15 +147,25 @@ def get_features(header, recording, leads, wide_features=False, preprocessing=Fa
 	return age, sex, recording
 
 
+def correct_leads(header, recording, leads):
+	available_leads = get_leads(header)
+	indices = list()
+	for lead in leads:
+		i = available_leads.index(lead)
+		indices.append(i)
+	recording = recording[indices, :]
+	return recording
 
+def lead_indexes(twelve_leads, leads):
+	indexes = np.zeros(12, dtype=bool)
+	for lead in leads:
+		if lead in twelve_leads:
+			idx = twelve_leads.index(lead)
+			indexes[idx] = 1
+		else:
+			raise Exception(lead, 'not in', twelve_leads)
 
-
-
-
-
-
-
-
+	return indexes
 
 
 
