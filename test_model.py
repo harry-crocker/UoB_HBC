@@ -13,9 +13,9 @@ def test_model(model_directory, data_directory, output_directory):
     print('Loading models...')
 
     twelve_lead_model = load_twelve_lead_model(model_directory)
-    six_lead_model = load_six_lead_model(model_directory)
-    three_lead_model = load_three_lead_model(model_directory)
-    two_lead_model = load_two_lead_model(model_directory)
+    # six_lead_model = load_six_lead_model(model_directory)
+    # three_lead_model = load_three_lead_model(model_directory)
+    # two_lead_model = load_two_lead_model(model_directory)
 
     # Find header and recording files.
     print('Finding header and recording files...')
