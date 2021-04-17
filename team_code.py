@@ -64,9 +64,6 @@ def training_code(data_directory, model_directory):
 	# Loop through each  model and train
 	############
 	for model_leads,  model_filename in zip(lead_configurations, model_filenames):
-		if dev_mode:
-			run = wandb.init(project='FinalModels', allow_val_change=True)
-
 		print('Training', model_filename)
 		print(model_leads)
 		# Add lead-specific model configurations
