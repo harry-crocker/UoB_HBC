@@ -87,7 +87,7 @@ def load_data(header_files, recording_files, leads, classes):
 def train_generator(labels_list, recording_list, ecg_lengths, config, val=False):
 	wind = config.Window_length
 	bs = config.batch_size
-	num_recordings = len(recording_files)
+	num_recordings = len(labels_list)
 	probs = np.array(ecg_lengths)/np.sum(ecg_lengths)
 	if val:
 		probs=None
