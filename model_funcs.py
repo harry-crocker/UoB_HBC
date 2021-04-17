@@ -35,18 +35,18 @@ if dev_mode:
 
 # Create all configuration files
 config = Config_file()
-config.num_modules = 6 # 6
+config.num_modules = 12 # 6
 config.lr = 1e-2  # 1e-2
-config.batch_size = 64  # PTB-XL = 128
+config.batch_size = 256  # PTB-XL = 128
 config.optimizer='AdamWeightDecay'
-config.wd = 1e-2 # Float
-config.Window_length = 250 # 250
+config.wd = 3e-2 # Float
+config.Window_length = 350 # 250
 config.lap = 0.5
 config.loss_func = 'BC'   # BC Or F1
 config.SpE = 1 # 1
-config.filters = 32
-config.kernel_sizes = [10, 20, 40] #[9, 23, 49]
-config.head_nodes = 512
+config.filters = 16
+config.kernel_sizes = [5, 7, 9] #[9, 23, 49]
+config.head_nodes = 1024
 config.val_split = 0.08
 config.epochs = 50
 
