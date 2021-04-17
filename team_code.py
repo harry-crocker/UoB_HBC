@@ -71,7 +71,6 @@ def training_code(data_directory, model_directory):
 		config.num_leads = len(config.leads)
 		config.input_shape = [config.Window_length, config.num_leads]
 		config.thresholds = [0.5]*num_classes	# Reset this
-		config.epochs = 50 #30 + 3*config.num_leads
 		config.lead_indexes = lead_indexes(twelve_leads, config.leads)
 
 		cbs = []
