@@ -408,6 +408,16 @@ class Config_file():
 	pass
 
 
+dev_mode = True
+if dev_mode:
+	import tensorflow_addons as tfa
+	import wandb
+	run = wandb.init(project='2LeadTuning', allow_val_change=True)	# Also change the file names in team_code
+	# Also change metrics 
+	# Also change update thresholds
+	# Also change load model in test_model.py
+
+
 # Create all configuration files
 config = Config_file()
 config.num_modules = 6 # 6
