@@ -5,9 +5,6 @@ from helper_code import *
 import sys
 
 if __name__ == '__main__':
-    # Parse arguments.
-    if len(sys.argv) != 3:
-        raise Exception('Include the data and model folders as arguments, e.g., python train_model.py data model.')
 
     data_directory = sys.argv[1]
 
