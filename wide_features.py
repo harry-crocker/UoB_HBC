@@ -23,16 +23,17 @@ if __name__ == '__main__':
 
         age = get_age(header)
         sex = get_sex(header)
+        print(sex)
 
         if age:
             age_count += 1
-            print(age)
         else:
             age_nan += 1
 
 
         if sex:
             sex_count += 1
+
         else:
             sex_nan +=1 
 
