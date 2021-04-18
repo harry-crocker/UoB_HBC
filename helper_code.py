@@ -69,7 +69,7 @@ def get_age(header):
             try:
                 age = float(l.split(': ')[1].strip())
             except:
-                age = float('nan')
+                pass
     return age
 
 # Get age from header.

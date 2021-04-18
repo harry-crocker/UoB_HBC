@@ -1,8 +1,8 @@
-print(1 is 1)
 
-class c():
-	pass
+l = []
 
-c.age = 10
-if c.n:
-	print(True)
+a = None
+
+l.append(a)
+
+print(l)
