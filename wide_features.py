@@ -26,6 +26,7 @@ if __name__ == '__main__':
 
         if age:
             age_count += 1
+            print(age)
         else:
             age_nan += 1
 
