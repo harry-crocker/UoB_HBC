@@ -112,6 +112,7 @@ def training_code(data_directory, model_directory):
             # Load header and recording.
             header = load_header(val_header_files[i])
             recording = load_recording(val_recording_files[i])
+            recording = correct_leads(header, recording, twelve_leads)
             leads = get_leads(header)
 
             # Apply model to recording.
@@ -217,7 +218,6 @@ def run_model(model, header, recording):
     thresholds = config.thresholds
 
     # Preprocess recording
-    recording = correct_leads(header, recording, leads)
     recording = np.swapaxes(recording, 0, 1)    # Needs to be of form (num_samples, num_channels)
     # Downsample recording
     frequency = get_frequency(header)
