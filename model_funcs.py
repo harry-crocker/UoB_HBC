@@ -385,7 +385,7 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
     x = layers.Concatenate(axis=1)([x1, x2])
     
     x = layers.BatchNormalization()(x)
-    # x = layers.Dropout(0.25)(x)
+    x = layers.Dropout(0.25)(x)
     
     # x = layers.Dense(head_nodes, activation='relu')(x)
     # x = layers.Dropout(0.5)(x)
@@ -426,8 +426,7 @@ def WideModel(hidden_nodes):
 
 def combine_models(cnn, mlp, num_classes, final_nodes, wind, learning_rate, wd):
     x = layers.concatenate([cnn.output, mlp.output])
-    x = layers.Dropout(0.25)(x)
-    x = layers.Dense(final_nodes)(x)
+    x = layers.Dense(final_nodes, activation='relu')(x)
     x = layers.Dropout(0.5)(x)
     output_layer = layers.Dense(num_classes, activation='sigmoid')(x)
     
@@ -444,14 +443,6 @@ def combine_models(cnn, mlp, num_classes, final_nodes, wind, learning_rate, wd):
     model.compile(loss=loss, optimizer=optimizer,metrics=['accuracy', auroc, F1, lr_metric])
     
     return model
-
-
-
-
-
-
-
-
 
 
 
