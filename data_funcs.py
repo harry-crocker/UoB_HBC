@@ -168,6 +168,27 @@ def lead_indexes(twelve_leads, leads):
 	return indexes
 
 
+def get_wide(header):
+	age = get_age(header)
+	if age is None:
+		age = 0
+	else:
+		age = age/100
+
+	# Extract sex. Encode as 0 for female, 1 for male, and NaN for other.
+	sex = get_sex(header)
+	if sex in ('Female', 'female', 'F', 'f'):
+		sex = 0
+	elif sex in ('Male', 'male', 'M', 'm'):
+		sex = 1
+	else:
+		sex = 0.5
+
+	return np.array([sex, age])
+
+
+
+
 
 
 

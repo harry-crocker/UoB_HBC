@@ -70,6 +70,8 @@ def load_data(header_files, recording_files, leads, classes):
 		frequency = get_frequency(header)
 		num_samples = get_num_samples(header)
 		recording = downsample_recording(recording, frequency, num_samples)
+
+		wide = get_wide(header)
 		# Get labels
 		labels = one_hot_encode_labels(header, classes)
 		# Get ecg length in seconds
@@ -78,7 +80,7 @@ def load_data(header_files, recording_files, leads, classes):
 		ecg_lengths.append(ecg_len)
 		header_list.append(header)
 		labels_list.append(labels)
-		recording_list.append(recording)
+		recording_list.append([recording, wide])
 		if i % 1000 ==1:
 			print(i, '/', len(recording_files)) 
 
@@ -95,6 +97,7 @@ def train_generator(labels_list, recording_list, ecg_lengths, config, val=False)
 
 	# Need to reset these every batch
 	inputs = []
+	inputs_wide = []
 	targets = []
 	bc = 0  # Batch count increments after every recording
 	# Select ecgs indexes for this batch
@@ -105,7 +108,7 @@ def train_generator(labels_list, recording_list, ecg_lengths, config, val=False)
 		file_idx = file_idxs[bc]
 		# Get data from list
 		labels = labels_list[file_idx]
-		recording = recording_list[file_idx]
+		recording, wide = recording_list[file_idx] # FOR WIDE
 
 		# Get segement 
 		max_start_idx = recording.shape[0] - wind
@@ -113,16 +116,18 @@ def train_generator(labels_list, recording_list, ecg_lengths, config, val=False)
 		segment = recording[t_idx:t_idx+wind, config.lead_indexes] # SELECT LEADS HERE
 		# Append outputs to list 
 		inputs.append(segment)
+		inputs_wide.append(wide)
 		targets.append(labels)
 		
 		bc += 1
 		if bc >= bs:
 			# End of batch, output and reset
-			retX = np.array(inputs)
+			retX = [ np.array(inputs, dtype='float32'), np.array(inputs_wide, dtype='float32') ]
 			rety = np.array(targets)
 			yield (retX, rety)
 			# Generator will resume here after yield
 			inputs = []
+			inputs_wide = []
 			targets = []
 			bc = 0  # Batch count increments after every recording
 			# Select ecgs indexes for this batch
@@ -382,6 +387,10 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 	x = layers.Dense(head_nodes, activation='relu')(x)
 	x = layers.Dropout(0.5)(x)
 
+	output_layer = x
+
+	model = keras.Model(inputs=input_layer, outputs=output_layer)
+
 	output_layer = layers.Dense(num_classes, activation='sigmoid')(x)
 
 	model = CustomModel(wind, lap, inputs=input_layer, outputs=output_layer)
@@ -400,16 +409,48 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 	elif opt == 'AdamWeightDecay':
 		optimizer = transformers.AdamWeightDecay(learning_rate=learning_rate, weight_decay_rate=wd )#, beta_2=0.99, epsilon=1e-5)
 	
-	# # Metrics
-	lr_metric = get_lr_metric(optimizer)
-	auroc = tf.keras.metrics.AUC()
-	F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
 	
 	model.compile(loss=loss, 
 				  optimizer=optimizer,
 				  metrics=['accuracy', auroc, F1, lr_metric])
 
 	return model
+
+
+def WideModel(hidden_nodes):
+    input_layer = layers.Input(shape=2)
+    output_layer = layers.Dense(hidden_nodes, activation='relu')(input_layer)
+    model = keras.Model(inputs=input_layer, outputs=output_layer)
+    return model
+
+def combine_models(cnn, mlp, num_classes, final_nodes, wind, learning_rate, wd):
+    x = layers.concatenate([cnn.output, mlp.output])
+    x = layers.Dense(final_nodes)(x)
+    x = layers.Dropout(0.5)(x)
+    output_layer = layers.Dense(num_classes, activation='sigmoid')(x)
+    
+    model = CustomModel(wind, 0.5, inputs=[cnn.input, mlp.input], outputs=output_layer)
+    
+    loss = 'binary_crossentropy'
+    optimizer = transformers.AdamWeightDecay(learning_rate=learning_rate, weight_decay_rate=wd )#, beta_2=0.99, epsilon=1e-5)
+
+    	# # Metrics
+	lr_metric = get_lr_metric(optimizer)
+	auroc = tf.keras.metrics.AUC()
+	F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
+    
+    model.compile(loss=loss, optimizer=optimizer,metrics=['accuracy', auroc, F1, lr_metric])
+    
+    return model
+
+
+
+
+
+
+
+
+
 
 
 # Threshold funnctions
