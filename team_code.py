@@ -80,8 +80,12 @@ def training_code(data_directory, model_directory):
 		cbs.append(WandbCallback())
 
 		# Build Model
-		model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
+		cnn = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
 									config.Window_length, config.lap, config.filters, config.kernel_sizes, config.head_nodes)
+
+		mlp = WideModel(config.wide_nodes)
+
+		model = combine_models(cnn, mlp, config.num_classes, config.head_nodes, config.Window_length, config.lr, config.wd)
 
 		# Train model
 		history = model.fit(train_generator(train_labels_list, train_recording_list, train_ecg_lengths, config), 
@@ -213,17 +217,23 @@ def run_model(model, header, recording):
 	thresholds = config.thresholds
 
 	# Preprocess recording
-	_, _, recording = get_features(header, recording, config.leads)
+	recording = load_recording(recording_file)
+	# Preprocess recording
+	recording = correct_leads(header, recording, leads)
 	recording = np.swapaxes(recording, 0, 1)    # Needs to be of form (num_samples, num_channels)
-	# Get sampling data from header
+	# Downsample recording
 	frequency = get_frequency(header)
 	num_samples = get_num_samples(header)
-	# Downsample the recording
 	recording = downsample_recording(recording, frequency, num_samples)
+
+	wide = get_wide(header)
+	recording = recording[:, config.lead_indexes]
+
 	recording = np.expand_dims(recording, 0)    # Needs to be of form (num_recordings, num_samples, num_channels)
+	wide = np.expand_dims(wide, 0)    # Needs to be of form (num_recordings, features)
 
 	# Predict
-	outputs = model.compute_predictions(recording)[0] # Only a single prediction (opposite of above)
+	outputs = model.compute_predictions([recording, wide])[0] # Only a single prediction (opposite of above)
 
 	# Predict labels and probabilities.
 	labels = [0]*config.num_classes

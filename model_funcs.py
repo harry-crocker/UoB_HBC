@@ -47,8 +47,9 @@ config.SpE = 1 # 1
 config.filters = 32
 config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
 config.head_nodes = 2048
-config.val_split = 0.08
+config.val_split = 0.1
 config.epochs = 50
+config.wide_nodes = 8
 
 wandb.config.update(vars(config), allow_val_change=True)
 
@@ -290,20 +291,22 @@ class CustomModel(keras.Model):
 	def compute_predictions(self, X):
 		wind = self.wind
 		lap = self.lap
-		sample_length = X.shape[1]
-		max_start_idx = sample_length - wind # Exclusive
-		y_pred = []
-		
-		step = int(wind*(1-lap))
-		tidx = 0
-		while tidx <= max_start_idx:
-			segments = X[:, tidx:tidx+wind, :]
-			segment_preds = self(segments, training=False)
-			y_pred.append(segment_preds)
-			tidx += step
-		y_pred = tf.stack(y_pred, axis=2)
-		y_pred = tf.math.reduce_max(y_pred, axis=2)
-		return y_pred
+	    z = X[1]
+	    X = X[0]
+	    sample_length = X.shape[1] # Changed
+	    max_start_idx = sample_length - wind # Exclusive
+	    y_pred = []
+	    
+	    step = int(wind*(1-lap))
+	    tidx = 0
+	    while tidx <= max_start_idx:
+	            segments = X[:, tidx:tidx+wind, :]
+	            segment_preds = self([segments, z], training=False)  # Changed
+	            y_pred.append(segment_preds)
+	            tidx += step
+	    y_pred = tf.stack(y_pred, axis=2)
+	    y_pred = tf.math.reduce_max(y_pred, axis=2)
+	    return y_pred
 	
 
 def InceptionModule(input_tensor, num_filters=32, bottleneck_size=32, activation='linear', strides=1, bias=False, kernel_sizes=None):
@@ -382,14 +385,10 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 	x = layers.Concatenate(axis=1)([x1, x2])
 	
 	x = layers.BatchNormalization()(x)
-	x = layers.Dropout(0.25)(x)
+	# x = layers.Dropout(0.25)(x)
 	
-	x = layers.Dense(head_nodes, activation='relu')(x)
-	x = layers.Dropout(0.5)(x)
-
-	output_layer = x
-
-	model = keras.Model(inputs=input_layer, outputs=output_layer)
+	# x = layers.Dense(head_nodes, activation='relu')(x)
+	# x = layers.Dropout(0.5)(x)
 
 	# output_layer = layers.Dense(num_classes, activation='sigmoid')(x)
 
@@ -414,6 +413,8 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 	# 			  optimizer=optimizer,
 	# 			  metrics=['accuracy', auroc, F1, lr_metric])
 
+	model = keras.Model(inputs=input_layer, outputs=x)
+
 	return model
 
 
@@ -425,6 +426,7 @@ def WideModel(hidden_nodes):
 
 def combine_models(cnn, mlp, num_classes, final_nodes, wind, learning_rate, wd):
     x = layers.concatenate([cnn.output, mlp.output])
+    x = layers.Dropout(0.25)(x)
     x = layers.Dense(final_nodes)(x)
     x = layers.Dropout(0.5)(x)
     output_layer = layers.Dense(num_classes, activation='sigmoid')(x)
