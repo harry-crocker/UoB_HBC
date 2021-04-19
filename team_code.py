@@ -217,8 +217,6 @@ def run_model(model, header, recording):
     thresholds = config.thresholds
 
     # Preprocess recording
-    recording = load_recording(recording_file)
-    # Preprocess recording
     recording = correct_leads(header, recording, leads)
     recording = np.swapaxes(recording, 0, 1)    # Needs to be of form (num_samples, num_channels)
     # Downsample recording
