@@ -391,28 +391,28 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 
 	model = keras.Model(inputs=input_layer, outputs=output_layer)
 
-	output_layer = layers.Dense(num_classes, activation='sigmoid')(x)
+	# output_layer = layers.Dense(num_classes, activation='sigmoid')(x)
 
-	model = CustomModel(wind, lap, inputs=input_layer, outputs=output_layer)
+	# model = CustomModel(wind, lap, inputs=input_layer, outputs=output_layer)
 	
-	# Choose loss function
-	if loss_func == 'BC':
-		loss = 'binary_crossentropy'
-	elif loss_func == 'F1':
-		loss = macro_double_soft_f1
+	# # Choose loss function
+	# if loss_func == 'BC':
+	# 	loss = 'binary_crossentropy'
+	# elif loss_func == 'F1':
+	# 	loss = macro_double_soft_f1
 		
-	# Choose optimizer
-	if opt == 'Adam':
-		optimizer = keras.optimizers.Adam(learning_rate=learning_rate) # ,amsgrad=True)
-	elif opt == 'AdamW':
-		optimizer = tfa.optimizers.AdamW(learning_rate=learning_rate, weight_decay=wd, beta_2=0.99, epsilon=1e-5)
-	elif opt == 'AdamWeightDecay':
-		optimizer = transformers.AdamWeightDecay(learning_rate=learning_rate, weight_decay_rate=wd )#, beta_2=0.99, epsilon=1e-5)
+	# # Choose optimizer
+	# if opt == 'Adam':
+	# 	optimizer = keras.optimizers.Adam(learning_rate=learning_rate) # ,amsgrad=True)
+	# elif opt == 'AdamW':
+	# 	optimizer = tfa.optimizers.AdamW(learning_rate=learning_rate, weight_decay=wd, beta_2=0.99, epsilon=1e-5)
+	# elif opt == 'AdamWeightDecay':
+	# 	optimizer = transformers.AdamWeightDecay(learning_rate=learning_rate, weight_decay_rate=wd )#, beta_2=0.99, epsilon=1e-5)
 	
 	
-	model.compile(loss=loss, 
-				  optimizer=optimizer,
-				  metrics=['accuracy', auroc, F1, lr_metric])
+	# model.compile(loss=loss, 
+	# 			  optimizer=optimizer,
+	# 			  metrics=['accuracy', auroc, F1, lr_metric])
 
 	return model
 
