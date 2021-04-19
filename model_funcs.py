@@ -44,9 +44,9 @@ config.Window_length = 250 # 250
 config.lap = 0.5
 config.loss_func = 'BC'   # BC Or F1
 config.SpE = 1 # 1
-config.filters = 32
-config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
-config.head_nodes = 2048
+config.filters = 64
+config.kernel_sizes = [7, 15, 31] #[9, 23, 49]
+config.head_nodes = 1024
 config.val_split = 0.1
 config.epochs = 50
 
