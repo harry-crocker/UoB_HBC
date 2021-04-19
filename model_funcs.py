@@ -48,7 +48,7 @@ config.filters = 32
 config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
 config.head_nodes = 2048
 config.val_split = 0.1
-config.epochs = 1
+config.epochs = 50
 config.wide_nodes = 8
 
 wandb.config.update(vars(config), allow_val_change=True)
