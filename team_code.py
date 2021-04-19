@@ -182,8 +182,12 @@ def load_two_lead_model(model_directory):
 def load_model(filename):
     # Load config file, create fresh model, load weights into model
     config = load_object(filename+'Config.pkl')
-    model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, 
-                                config.loss_func, config.Window_length, config.lap, config.filters, config.kernel_sizes, config.head_nodes)
+    cnn = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
+                            config.Window_length, config.lap, config.filters, config.kernel_sizes, config.head_nodes)
+
+    mlp = WideModel(config.wide_nodes)
+
+    model = combine_models(cnn, mlp, config.num_classes, config.head_nodes, config.Window_length, config.lr, config.wd)
     model.load_weights(filename)
     return (model, config)
 
