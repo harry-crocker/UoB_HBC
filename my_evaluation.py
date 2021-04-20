@@ -1,9 +1,10 @@
 from evaluate_model import *
+from team_code import save_object
 
 import sys
 
 def run_evaluation(label_directory, output_directory, workspace):
-	# Define the weights, the SNOMED CT code for the normal class, and equivalent SNOMED CT codes.
+    # Define the weights, the SNOMED CT code for the normal class, and equivalent SNOMED CT codes.
     weights_file = 'weights.csv'
     normal_class = '426783006'
     equivalent_classes = [['713427006', '59118001'], ['284470004', '63593006'], ['427172004', '17338001']]
@@ -25,16 +26,17 @@ def run_evaluation(label_directory, output_directory, workspace):
     A = compute_modified_confusion_matrix(labels, outputs)
     np.save(A, workspace+'/big_confusion_matrix')
 
+    save_object(classes, workspace+'/classes')
 
 
 
 if __name__ == '__main__':
-	label_directory = sys.argv[1]
-	output_directory = sys.argv[2]
-	workspace = sys.argv[3]
-	print(workspace)
+    label_directory = sys.argv[1]
+    output_directory = sys.argv[2]
+    workspace = sys.argv[3]
+    print(workspace)
 
-	if not os.path.isdir(workspace):
+    if not os.path.isdir(workspace):
         os.mkdir(workspace)
 
-	run_evaluation(label_directory, output_directory, workspace)
+    run_evaluation(label_directory, output_directory, workspace)
