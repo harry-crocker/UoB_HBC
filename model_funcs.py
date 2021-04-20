@@ -27,7 +27,7 @@ dev_mode = True
 if dev_mode:
 	import tensorflow_addons as tfa
 	import wandb
-	run = wandb.init(project='FinalModels', allow_val_change=True)	# Also change the file names in team_code
+    # Also change the file names in team_code
 	# Also change metrics 
 	# Also change update thresholds
 	# Also change load model in test_model.py
@@ -35,22 +35,20 @@ if dev_mode:
 
 # Create all configuration files
 config = Config_file()
-config.num_modules = 12 # 6
-config.lr = 1e-2  # 1e-2
-config.batch_size = 256  # PTB-XL = 128
+config.num_modules = 6 # 6
+config.lr = 3e-3  # 1e-2
+config.batch_size = 128  # PTB-XL = 128
 config.optimizer='AdamWeightDecay'
 config.wd = 1e-2 # Float
-config.Window_length = 350 # 250
+config.Window_length = 250 # 250
 config.lap = 0.5
 config.loss_func = 'BC'   # BC Or F1
 config.SpE = 1 # 1
-config.filters = 16
-config.kernel_sizes = [5, 7, 9] #[9, 23, 49]
-config.head_nodes = 1024
+config.filters = 32
+config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
+config.head_nodes = 2048
 config.val_split = 0.1
 config.epochs = 50
-
-wandb.config.update(vars(config), allow_val_change=True)
 
 
 def load_data(header_files, recording_files, leads, classes):

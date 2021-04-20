@@ -19,8 +19,8 @@ twelve_lead_model_filename = '12_lead_model'
 six_lead_model_filename = '6_lead_model'
 three_lead_model_filename = '3_lead_model'
 two_lead_model_filename = '2_lead_model'
-model_filenames = [twelve_lead_model_filename] #(twelve_lead_model_filename, six_lead_model_filename, three_lead_model_filename, two_lead_model_filename)
-lead_configurations = [twelve_leads] #(twelve_leads, six_leads, three_leads, two_leads)	# Defined in helper_code.py
+model_filenames = (twelve_lead_model_filename, six_lead_model_filename, three_lead_model_filename, two_lead_model_filename)
+lead_configurations = (twelve_leads, six_leads, three_leads, two_leads)	# Defined in helper_code.py
 
 
 ################################################################################
@@ -72,6 +72,9 @@ def training_code(data_directory, model_directory):
 		config.input_shape = [config.Window_length, config.num_leads]
 		config.thresholds = [0.5]*num_classes	# Reset this
 		config.lead_indexes = lead_indexes(twelve_leads, config.leads)
+
+        run = wandb.init(project='FinalModels', allow_val_change=True)  
+        wandb.config.update(vars(config), allow_val_change=True)
 
 		cbs = []
 		steps = config.SpE * np.ceil(len(train_recording_files) / config.batch_size) * config.epochs
