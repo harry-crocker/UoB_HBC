@@ -304,7 +304,7 @@ def compute_confusion_matrices(labels, outputs, normalize=False):
                     A[j, 0, 0] += 1.0/normalization
                 else: # This condition should not happen.
                     raise ValueError('Error in computing the confusion matrix.')
-
+    print(A)
     return A
 
 # Compute macro F-measure.
@@ -429,7 +429,7 @@ def compute_modified_confusion_matrix(labels, outputs):
                 for k in range(num_classes):
                     if outputs[i, k]:
                         A[j, k] += 1.0/normalization
-
+    print(A)
     return A
 
 # Compute the evaluation metric for the Challenge.
