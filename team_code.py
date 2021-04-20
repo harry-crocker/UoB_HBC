@@ -131,6 +131,7 @@ def training_code(data_directory, model_directory):
         filename = os.path.join(model_directory, model_filename)
         model.save_weights(filename)
         save_object(config, filename+'Config.pkl')
+        run.join()
 
 
 ################################################################################
