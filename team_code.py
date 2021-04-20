@@ -72,6 +72,7 @@ def training_code(data_directory, model_directory):
         config.input_shape = [config.Window_length, config.num_leads]
         config.thresholds = [0.5]*num_classes   # Reset this
         config.lead_indexes = lead_indexes(twelve_leads, config.leads)
+        config.twelve_leads = twelve_leads
 
         cbs = []
         steps = config.SpE * np.ceil(len(train_recording_files) / config.batch_size) * config.epochs
@@ -112,7 +113,6 @@ def training_code(data_directory, model_directory):
             # Load header and recording.
             header = load_header(val_header_files[i])
             recording = load_recording(val_recording_files[i])
-            recording = correct_leads(header, recording, twelve_leads)
             leads = get_leads(header)
 
             # Apply model to recording.
@@ -214,14 +214,13 @@ def run_two_lead_model(model, header, recording):
     return run_model(model, header, recording)
 
 # Generic function for running a trained model.
-## Change this to accept a single recording 
-## Classes should use my function get_classes()
-def run_model(model, header, recording):
+def run_model(model, header, recording, calc_thresh=False):
     # Unpack model
-    model, config = model
-    thresholds = config.thresholds
+    models, configs = model
+    config = configs[0]
 
     # Preprocess recording
+    recording = correct_leads(header, recording, config.twelve_leads)
     recording = np.swapaxes(recording, 0, 1)    # Needs to be of form (num_samples, num_channels)
     # Downsample recording
     frequency = get_frequency(header)
@@ -235,15 +234,45 @@ def run_model(model, header, recording):
     wide = np.expand_dims(wide, 0)    # Needs to be of form (num_recordings, features)
 
     # Predict
-    outputs = model.compute_predictions([recording, wide])[0] # Only a single prediction (opposite of above)
+    probabilities = []
+    labels_list =[]
+    thresh_list = []
 
-    # Predict labels and probabilities.
-    labels = [0]*config.num_classes
-    for i in range(config.num_classes):
-        if outputs[i] > thresholds[i]:
-            labels[i] = 1
+    for model, config in zip(models, configs):
+        outputs = model.compute_predictions([recording, wide])[0] # Only a single prediction (opposite of above)
 
-    probabilities = list(np.array(outputs))
+        # If calc_thresh need probabilites for each model
+        if calc_thresh:
+            probabilities.append(outputs)
+            labels = 0
+
+        # if not calc_thresh need probabilities for AUROC and labels
+        else:
+            # Predict labels and probabilities.
+            thresholds = config.thresholds
+            labels = [0]*config.num_classes
+            for i in range(config.num_classes):
+                if outputs[i] > thresholds[i]:
+                    labels[i] = 1
+
+            labels_list.append(labels)
+            probabilities.append(outputs)
+
+    if not calc_thresh:
+        labels = np.array(labels_list)
+        probabilities = np.array(probabilities)
+        inverse_labels = np.array(~np.array(labels, dtype=bool), dtype=int)
+        pos = probabilities*labels
+        neg = probabilities*inverse_labels
+
+        labels = np.count_nonzero(labels, axis=0)
+        labels = np.array(labels>2.5, dtype=int) # Majority voting
+
+        inverse_labels = np.array(~np.array(labels, dtype=bool), dtype=int)
+
+        probabilities = np.array(pos*labels + neg*inverse_labels, dtype=float)
+        probabilities[probabilities==0] = np.nan
+        probabilities = np.nanmean(probabilities, axis=0)
 
     # Remove normal label if other problems found
     # normal_class = '426783006'
@@ -252,6 +281,8 @@ def run_model(model, header, recording):
     #   labels[norm_idx] == 0
 
     return config.classes, labels, probabilities
+
+
 
 ################################################################################
 #
