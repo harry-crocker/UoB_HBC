@@ -21,10 +21,10 @@ def run_evaluation(label_directory, output_directory, workspace):
 
 
     A = compute_confusion_matrices(labels, binary_outputs)
-    np.save(A, workspace+'/normal_confusion_matrix')
+    np.save(workspace+'/normal_confusion_matrix', A)
 
     A = compute_modified_confusion_matrix(labels, outputs)
-    np.save(A, workspace+'/big_confusion_matrix')
+    np.save(workspace+'/big_confusion_matrix', A)
 
     save_object(classes, workspace+'/classes')
 
