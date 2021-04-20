@@ -1,5 +1,5 @@
 from evaluate_model import *
-from team_code import save_object
+# from team_code import save_object
 
 import sys
 
@@ -28,6 +28,10 @@ def run_evaluation(label_directory, output_directory, workspace):
 
     save_object(classes, workspace+'/classes')
 
+
+def save_object(obj, filename):
+    with open(filename, 'wb') as output:  # Overwrites any existing file.
+        dill.dump(obj, output)
 
 
 if __name__ == '__main__':
