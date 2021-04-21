@@ -5,7 +5,7 @@ import dill
 import sys
 
 
-def my_compute_modified_confusion_matrix(labels, outputs):
+def my_compute_modified_confusion_matrix(labels, outputs, norm=True):
     # Compute a binary multi-class, multi-label confusion matrix, where the rows
     # are the labels and the columns are the outputs.
     num_recordings, num_classes = np.shape(labels)
@@ -15,6 +15,9 @@ def my_compute_modified_confusion_matrix(labels, outputs):
     for i in range(num_recordings):
         # Calculate the number of positive labels and/or outputs.
         normalization = float(max(   np.sum(np.any(  (labels[i, :], outputs[i, :]), axis=0)  ), 1   ))
+        if not norm:
+            normalization=1
+
         # Iterate over all of the classes.
         for j in range(num_classes):
             # Assign full and/or partial credit for each positive class.
@@ -67,10 +70,10 @@ def run_evaluation(label_directory, output_directory, workspace):
     A = compute_confusion_matrices(labels, binary_outputs)
     np.save(workspace+'/normal_confusion_matrix', A)
 
-    A = compute_modified_confusion_matrix(labels, binary_outputs)
+    A = compute_modified_confusion_matrix(labels, binary_outputs, norm=True)
     np.save(workspace+'/big_confusion_matrix_norm', A)
 
-    A = my_compute_modified_confusion_matrix(labels, binary_outputs)
+    A = my_compute_modified_confusion_matrix(labels, binary_outputs, norm=True)
     np.save(workspace+'/my_big_confusion_matrix_norm', A)
 
     A = compute_modified_confusion_matrix(labels, binary_outputs, norm=False)
