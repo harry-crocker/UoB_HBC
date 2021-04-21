@@ -295,17 +295,18 @@ def compute_confusion_matrices(labels, outputs, normalize=False):
             normalization = float(max(np.sum(labels[i, :]), 1))
             for j in range(num_classes):
                 if labels[i, j]==1 and outputs[i, j]==1: # TP
-                    A[j, 1, 1] += 1
+                    A[j, 1, 1] += 1.0/normalization
                 elif labels[i, j]==0 and outputs[i, j]==1: # FP
-                    A[j, 1, 0] += 1
+                    A[j, 1, 0] += 1.0/normalization
                 elif labels[i, j]==1 and outputs[i, j]==0: # FN
-                    A[j, 0, 1] += 1
+                    A[j, 0, 1] += 1.0/normalization
                 elif labels[i, j]==0 and outputs[i, j]==0: # TN
-                    A[j, 0, 0] += 1
+                    A[j, 0, 0] += 1.0/normalization
                 else: # This condition should not happen.
                     raise ValueError('Error in computing the confusion matrix.')
-    # print(A)
+
     return A
+
 
 # Compute macro F-measure.
 def compute_f_measure(labels, outputs):
@@ -428,7 +429,7 @@ def compute_modified_confusion_matrix(labels, outputs):
             if labels[i, j]:
                 for k in range(num_classes):
                     if outputs[i, k]:
-                        A[j, k] += 1  #.0/normalization
+                        A[j, k] += 1.0/normalization
     # print(A)
     return A
 
