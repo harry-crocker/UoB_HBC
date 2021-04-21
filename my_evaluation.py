@@ -4,6 +4,27 @@ import dill
 
 import sys
 
+def compute_big_confusion_matrix(labels, outputs):
+    # Compute a binary multi-class, multi-label confusion matrix, where the rows
+    # are the labels and the columns are the outputs.
+    num_recordings, num_classes = np.shape(labels)
+    A = np.zeros((num_classes, num_classes))
+
+    # Iterate over all of the recordings.
+    for i in range(num_recordings):
+        # Calculate the number of positive labels and/or outputs.
+        normalization = float(max(   np.sum(np.any(  (labels[i, :], outputs[i, :]), axis=0)  ), 1   ))
+        # Iterate over all of the classes.
+        for j in range(num_classes):
+            # Assign full and/or partial credit for each positive class.
+            if labels[i, j]:
+                for k in range(num_classes):
+                    if outputs[i, k]:
+                        A[j, k] += 1  #.0/normalization
+    # print(A)
+    return A
+
+
 def run_evaluation(label_directory, output_directory, workspace):
     # Define the weights, the SNOMED CT code for the normal class, and equivalent SNOMED CT codes.
     weights_file = 'weights.csv'
@@ -24,7 +45,7 @@ def run_evaluation(label_directory, output_directory, workspace):
     A = compute_confusion_matrices(labels, binary_outputs)
     np.save(workspace+'/normal_confusion_matrix', A)
 
-    A = compute_modified_confusion_matrix(labels, binary_outputs)
+    A = compute_big_confusion_matrix(labels, binary_outputs)
     np.save(workspace+'/big_confusion_matrix', A)
 
     save_object(classes, workspace+'/classes')
