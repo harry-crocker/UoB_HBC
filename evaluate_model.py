@@ -413,7 +413,7 @@ def compute_auc(labels, outputs):
     return macro_auroc, macro_auprc, auroc, auprc
 
 # Compute modified confusion matrix for multi-class, multi-label tasks.
-def compute_modified_confusion_matrix(labels, outputs):
+def compute_modified_confusion_matrix(labels, outputs, norm=True):
     # Compute a binary multi-class, multi-label confusion matrix, where the rows
     # are the labels and the columns are the outputs.
     num_recordings, num_classes = np.shape(labels)
@@ -423,6 +423,9 @@ def compute_modified_confusion_matrix(labels, outputs):
     for i in range(num_recordings):
         # Calculate the number of positive labels and/or outputs.
         normalization = float(max(   np.sum(np.any(  (labels[i, :], outputs[i, :]), axis=0)  ), 1   ))
+        if not norm:
+            normalization=1
+
         # Iterate over all of the classes.
         for j in range(num_classes):
             # Assign full and/or partial credit for each positive class.
