@@ -295,13 +295,13 @@ def compute_confusion_matrices(labels, outputs, normalize=False):
             normalization = float(max(np.sum(labels[i, :]), 1))
             for j in range(num_classes):
                 if labels[i, j]==1 and outputs[i, j]==1: # TP
-                    A[j, 1, 1] += 1.0/normalization
+                    A[j, 1, 1] += 1
                 elif labels[i, j]==0 and outputs[i, j]==1: # FP
-                    A[j, 1, 0] += 1.0/normalization
+                    A[j, 1, 0] += 1
                 elif labels[i, j]==1 and outputs[i, j]==0: # FN
-                    A[j, 0, 1] += 1.0/normalization
+                    A[j, 0, 1] += 1
                 elif labels[i, j]==0 and outputs[i, j]==0: # TN
-                    A[j, 0, 0] += 1.0/normalization
+                    A[j, 0, 0] += 1
                 else: # This condition should not happen.
                     raise ValueError('Error in computing the confusion matrix.')
     # print(A)
