@@ -27,6 +27,9 @@ dev_mode = True
 if dev_mode:
     import tensorflow_addons as tfa
     import wandb
+    # # Metrics
+    auroc = tf.keras.metrics.AUC()
+    F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
     # Also change the file names in team_code
     # Also change metrics 
     # Also change update thresholds
@@ -398,10 +401,7 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
     elif opt == 'AdamWeightDecay':
         optimizer = transformers.AdamWeightDecay(learning_rate=learning_rate, weight_decay_rate=wd )#, beta_2=0.99, epsilon=1e-5)
     
-    # # Metrics
     lr_metric = get_lr_metric(optimizer)
-    auroc = tf.keras.metrics.AUC()
-    F1 = tfa.metrics.F1Score(num_classes=num_classes, threshold=0.5, average='macro')
     
     model.compile(loss=loss, 
                   optimizer=optimizer,
