@@ -71,6 +71,8 @@ def multilabel_confusion(labels, outputs):
     for i in range(num_recordings):
         Y = labels[i]
         Z = outputs[i]
+        if sum(Y)==0 or sum(Z)==0:
+            print(0)
         # print('Y*Z', Y*Z)
         # print('Y/Z', b_slash(Y, Z))
         # print('Z/Y', b_slash(Z, Y))
@@ -80,13 +82,13 @@ def multilabel_confusion(labels, outputs):
 
 
         elif np.sum(b_slash(Y, Z)) == 0:
-            C = ( np.outer( Y*Z ,  b_slash(Z, Y) )  +  np.sum(Y)*np.diag(Y) )/ np.sum(Z)
+            C = ( np.outer( Y*Z ,  b_slash(Z, Y) )  +  np.sum(Y)*np.diag(Y) ) / np.max([np.sum(Z), 1])
             # print(1)
         elif np.sum(b_slash(Z, Y)) == 0: 
-            C = np.outer( b_slash(Y, Z) ,  Z )/np.sum(Z)   + np.diag(Z)
+            C = np.outer( b_slash(Y, Z) ,  Z ) / np.max([np.sum(Z), 1])   + np.diag(Z)
             # print(2)
         else:
-            C = np.outer( b_slash(Y, Z) ,  b_slash(Z, Y) )/np.sum(b_slash(Z, Y))  +  np.diag(Y*Z)
+            C = np.outer( b_slash(Y, Z) ,  b_slash(Z, Y) ) / np.max([np.sum(b_slash(Z, Y)), 1]) +  np.diag(Y*Z)
             # print(3)
     
         A += C
