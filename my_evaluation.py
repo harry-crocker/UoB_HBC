@@ -68,11 +68,13 @@ def multilabel_confusion(labels, outputs):
     num_recordings, num_classes = np.shape(labels)
     A = np.zeros((num_classes, num_classes))
 
+    counter = 0
+
     for i in range(num_recordings):
         Y = labels[i]
         Z = outputs[i]
         if sum(Y)==0 or sum(Z)==0:
-            print(0)
+            counter += 1
         # print('Y*Z', Y*Z)
         # print('Y/Z', b_slash(Y, Z))
         # print('Z/Y', b_slash(Z, Y))
@@ -92,6 +94,7 @@ def multilabel_confusion(labels, outputs):
             # print(3)
     
         A += C
+    print(counter)
     return A
 
 
