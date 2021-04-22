@@ -73,7 +73,7 @@ def multilabel_confusion(labels, outputs):
     for i in range(num_recordings):
         Y = labels[i]
         Z = outputs[i]
-        if sum(Y)==0 or sum(Z)==0:
+        if sum(Z)==0:
             counter += 1
         # print('Y*Z', Y*Z)
         # print('Y/Z', b_slash(Y, Z))
