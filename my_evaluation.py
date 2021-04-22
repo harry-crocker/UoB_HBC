@@ -84,13 +84,13 @@ def multilabel_confusion(labels, outputs):
 
 
         elif np.sum(b_slash(Y, Z)) == 0:
-            C = ( np.outer( Y*Z ,  b_slash(Z, Y) )  +  np.sum(Y)*np.diag(Y) ) / np.max([np.sum(Z), 1])
+            C = ( np.outer( Y*Z ,  b_slash(Z, Y) )  +  np.sum(Y)*np.diag(Y) ) / np.max([np.sum(Z), 0.1])
             # print(1)
         elif np.sum(b_slash(Z, Y)) == 0: 
-            C = np.outer( b_slash(Y, Z) ,  Z ) / np.max([np.sum(Z), 1])   + np.diag(Z)
+            C = np.outer( b_slash(Y, Z) ,  Z ) / np.max([np.sum(Z), 0.1])   + np.diag(Z)
             # print(2)
         else:
-            C = np.outer( b_slash(Y, Z) ,  b_slash(Z, Y) ) / np.max([np.sum(b_slash(Z, Y)), 1]) +  np.diag(Y*Z)
+            C = np.outer( b_slash(Y, Z) ,  b_slash(Z, Y) ) / np.max([np.sum(b_slash(Z, Y)), 0.1]) +  np.diag(Y*Z)
             # print(3)
     
         A += C
