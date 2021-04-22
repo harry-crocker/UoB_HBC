@@ -63,15 +63,17 @@ def b_slash(A, B):
 def multilabel_confusion(labels, outputs):
     # Y is labels
     # Z is predictions
+    labels = np.array(labels, dtype=int)
+    outputs = np.array(outputs, dtype=int)
     num_recordings, num_classes = np.shape(labels)
     A = np.zeros((num_classes, num_classes))
 
     for i in range(num_recordings):
         Y = labels[i]
         Z = outputs[i]
-        print('Y*Z', Y*Z)
-        print('Y/Z', b_slash(Y, Z))
-        print('Z/Y', b_slash(Z, Y))
+        # print('Y*Z', Y*Z)
+        # print('Y/Z', b_slash(Y, Z))
+        # print('Z/Y', b_slash(Z, Y))
 
         if np.all(Y == Z):
             C = np.diag(Y)
@@ -79,13 +81,13 @@ def multilabel_confusion(labels, outputs):
 
         elif np.sum(b_slash(Y, Z)) == 0:
             C = ( np.outer( Y*Z ,  b_slash(Z, Y) )  +  np.sum(Y)*np.diag(Y) )/ np.sum(Z)
-            print(1)
+            # print(1)
         elif np.sum(b_slash(Z, Y)) == 0: 
             C = np.outer( b_slash(Y, Z) ,  Z )/np.sum(Z)   + np.diag(Z)
-            print(2)
+            # print(2)
         else:
             C = np.outer( b_slash(Y, Z) ,  b_slash(Z, Y) )/np.sum(b_slash(Z, Y))  +  np.diag(Y*Z)
-            print(3)
+            # print(3)
     
         A += C
     return A
