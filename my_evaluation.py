@@ -49,6 +49,47 @@ def compute_big_confusion_matrix(labels, outputs):
     # print(A)
     return A
 
+def b_slash(A, B):
+    # Returns A\B
+    # Returns labels in A but not in B
+    # A = [1, 1, 1, 0]
+    # B = [1, 1, 0, 0]
+    # C = [0, 0, 1, 0]
+
+    dot = A*B
+    C = A - dot
+    return C
+
+def multilabel_confusion(labels, outputs):
+    # Y is labels
+    # Z is predictions
+    num_recordings, num_classes = np.shape(labels)
+    A = np.zeros((num_classes, num_classes))
+
+    for i in range(num_recordings):
+        Y = labels[i]
+        Z = outputs[i]
+        print('Y*Z', Y*Z)
+        print('Y/Z', b_slash(Y, Z))
+        print('Z/Y', b_slash(Z, Y))
+
+        if np.all(Y == Z):
+            C = np.diag(Y)
+
+
+        elif np.sum(b_slash(Y, Z)) == 0:
+            C = ( np.outer( Y*Z ,  b_slash(Z, Y) )  +  np.sum(Y)*np.diag(Y) )/ np.sum(Z)
+            print(1)
+        elif np.sum(b_slash(Z, Y)) == 0: 
+            C = np.outer( b_slash(Y, Z) ,  Z )/np.sum(Z)   + np.diag(Z)
+            print(2)
+        else:
+            C = np.outer( b_slash(Y, Z) ,  b_slash(Z, Y) )/np.sum(b_slash(Z, Y))  +  np.diag(Y*Z)
+            print(3)
+    
+        A += C
+    return A
+
 
 def run_evaluation(label_directory, output_directory, workspace):
     # Define the weights, the SNOMED CT code for the normal class, and equivalent SNOMED CT codes.
@@ -81,6 +122,10 @@ def run_evaluation(label_directory, output_directory, workspace):
 
     A = my_compute_modified_confusion_matrix(labels, binary_outputs, norm=False)
     np.save(workspace+'/my_big_confusion_matrix', A)
+
+
+    A = multilabel_confusion(labels, binary_outputs)
+    np.save(workspace+'/proper_con_mat', A)
 
     save_object(classes, workspace+'/classes')
 
