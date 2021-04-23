@@ -15,7 +15,7 @@ import wandb
 from wandb.keras import WandbCallback
 
 # To change when found save model
-twelve_lead_model_filename = '12_lead_model'
+twelve_lead_model_filename = '12_lead_model_PTBXL_ONLY'
 six_lead_model_filename = '6_lead_model'
 three_lead_model_filename = '3_lead_model'
 two_lead_model_filename = '2_lead_model'
