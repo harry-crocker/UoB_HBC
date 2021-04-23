@@ -39,16 +39,16 @@ if dev_mode:
 config = Config_file()
 config.num_modules = 6 # 6
 config.lr = 3e-3  # 1e-2
-config.batch_size = 128  # PTB-XL = 128
-config.optimizer='AdamWeightDecay'
-config.wd = 1e-2 # Float
+config.batch_size = 64  # PTB-XL = 128
+config.optimizer='Adam'
+config.wd = 1e-3 # Float
 config.Window_length = 250 # 250
 config.lap = 0.5
 config.loss_func = 'BC'   # BC Or F1
 config.SpE = 1 # 1
 config.filters = 32
-config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
-config.head_nodes = 2048
+config.kernel_sizes = [10, 20, 40] #[9, 23, 49]
+config.head_nodes = 0
 config.val_split = 0.1
 config.epochs = 50
 
@@ -371,16 +371,16 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
             x = keras.layers.Activation('relu')(x)
             shortcut_start = x
 
-    x1 = layers.GlobalAveragePooling1D()(x)
-    x2 = layers.GlobalMaxPooling1D()(x)
+    x = layers.GlobalAveragePooling1D()(x)
+    # x2 = layers.GlobalMaxPooling1D()(x)
 
-    x = layers.Concatenate(axis=1)([x1, x2])
+    # x = layers.Concatenate(axis=1)([x1, x2])
     
-    x = layers.BatchNormalization()(x)
-    x = layers.Dropout(0.25)(x)
+    # x = layers.BatchNormalization()(x)
+    # x = layers.Dropout(0.25)(x)
     
-    x = layers.Dense(head_nodes, activation='relu')(x)
-    x = layers.Dropout(0.5)(x)
+    # x = layers.Dense(head_nodes, activation='relu')(x)
+    # x = layers.Dropout(0.5)(x)
 
     output_layer = layers.Dense(num_classes, activation='sigmoid')(x)
 
