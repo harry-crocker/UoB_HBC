@@ -19,9 +19,11 @@ twelve_lead_model_filename = '12_lead_model'
 six_lead_model_filename = '6_lead_model'
 three_lead_model_filename = '3_lead_model'
 two_lead_model_filename = '2_lead_model'
-model_filenames = (six_lead_model_filename, three_lead_model_filename, two_lead_model_filename) # twelve_lead_model_filename
-lead_configurations = (six_leads, three_leads, two_leads) # Defined in helper_code.py   twelve_leads
+model_filenames = (twelve_lead_model_filename, six_lead_model_filename, three_lead_model_filename, two_lead_model_filename) # twelve_lead_model_filename
+lead_configurations = (twelve_leads, six_leads, three_leads, two_leads) # Defined in helper_code.py   twelve_leads
 
+model_filenames = [twelve_lead_model_filename]
+lead_configurations = [twelve_leads]
 
 ################################################################################
 #
