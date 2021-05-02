@@ -257,7 +257,7 @@ def load_outputs(output_files, classes, equivalent_classes):
 def compute_accuracy(labels, outputs):
     num_recordings, num_classes = np.shape(labels)
 
-    num_correct_recordings = 0s
+    num_correct_recordings = 0
     for i in range(num_recordings):
         if np.all(labels[i, :]==outputs[i, :]):
             num_correct_recordings += 1
