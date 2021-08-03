@@ -1,37 +1,49 @@
 #!/usr/bin/env python
 
 # Edit this script to add your team's training code.
-# Some functions are *required*, but you can edit most parts of required functions, remove non-required functions, and add your own function.
+# Some functions are *required*, but you can edit most parts of the required functions, remove non-required functions, and add your own functions.
+
+################################################################################
+#
+# Imported functions and variables
+#
+################################################################################
+
+# Import functions. These functions are not required. You can change or remove them.
+from helper_code import *
+import numpy as np, os, sys, joblib
+
 
 import dill
 import numpy as np, os, sys
 import tensorflow as tf
 
-from helper_code import *
-from model_funcs import *
-from data_funcs import *
-
 import wandb
 from wandb.keras import WandbCallback
 
-# To change when found save model
-twelve_lead_model_filename = '12_lead_model'
-six_lead_model_filename = '6_lead_model'
-three_lead_model_filename = '3_lead_model'
-two_lead_model_filename = '2_lead_model'
-model_filenames = (twelve_lead_model_filename, six_lead_model_filename, three_lead_model_filename, two_lead_model_filename) # twelve_lead_model_filename
-lead_configurations = (twelve_leads, six_leads, three_leads, two_leads) # Defined in helper_code.py   twelve_leads
+# Define the Challenge lead sets. These variables are not required. You can change or remove them.
+twelve_leads = ('I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6')
+six_leads = ('I', 'II', 'III', 'aVR', 'aVL', 'aVF')
+four_leads = ('I', 'II', 'III', 'V2')
+three_leads = ('I', 'II', 'V2')
+two_leads = ('I', 'II')
+lead_configurations = (twelve_leads, six_leads, four_leads, three_leads, two_leads)
 
-model_filenames = [twelve_lead_model_filename]
-lead_configurations = [twelve_leads]
+# twelve_lead_model_filename = '12_lead_model'
+# six_lead_model_filename = '6_lead_model'
+# four_lead_model_filename = '4_lead_model'
+# three_lead_model_filename = '3_lead_model'
+# two_lead_model_filename = '2_lead_model'
+# model_filenames = (twelve_lead_model_filename, six_lead_model_filename, four_lead_model_filename, three_lead_model_filename, two_lead_model_filename) 
 
-################################################################################
+
+####################################s############################################
 #
-# Training function
+# Training model function
 #
 ################################################################################
 
-# Train your model. This function is *required*. Do *not* change the arguments of this function.
+# Train your model. This function is *required*. You should edit this function to add your code, but do *not* change the arguments of this function.
 def training_code(data_directory, model_directory):
     # Create a folder for the model if it does not already exist.
     if not os.path.isdir(model_directory):
@@ -65,7 +77,8 @@ def training_code(data_directory, model_directory):
     #############
     # Loop through each  model and train
     ############
-    for model_leads,  model_filename in zip(lead_configurations, model_filenames):
+    for model_leads in lead_configurations:
+        model_filename = get_model_filename(model_leads)
         print('Training', model_filename)
         print(model_leads)
         # Add lead-specific model configurations
@@ -135,84 +148,13 @@ def training_code(data_directory, model_directory):
         save_object(config, filename+'Config.pkl')
         run.join()
 
-
 ################################################################################
 #
-# File I/O functions
-#
-################################################################################
-
-# I created these 2 functions
-def save_object(obj, filename):
-    with open(filename, 'wb') as output:  # Overwrites any existing file.
-        dill.dump(obj, output)
-
-def load_object(filename):
-    with open(filename, 'rb') as file:  # Overwrites any existing file.
-        return dill.load(file)
-
-
-# Save your trained models.
-## Dont use this
-def save_model(filename, classes, leads, imputer, classifier):
-    # Construct a data structure for the model and save it.
-    d = {'classes': classes, 'leads': leads, 'imputer': imputer, 'classifier': classifier}
-    joblib.dump(d, filename, protocol=0)
-
-# Load your trained 12-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
-def load_twelve_lead_model(model_directory):
-    filename = os.path.join(model_directory, twelve_lead_model_filename)
-    return load_model(filename)
-
-# Load your trained 6-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
-def load_six_lead_model(model_directory):
-    filename = os.path.join(model_directory, six_lead_model_filename)
-    return load_model(filename)
-
-# Load your trained 3-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
-def load_three_lead_model(model_directory):
-    filename = os.path.join(model_directory, three_lead_model_filename)
-    return load_model(filename)
-
-# Load your trained 2-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
-def load_two_lead_model(model_directory):
-    filename = os.path.join(model_directory, two_lead_model_filename)
-    return load_model(filename)
-
-# Generic function for loading a model.
-def load_model(filename):
-    # Load config file, create fresh model, load weights into model
-    config = load_object(filename+'Config.pkl')
-    model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, 
-                                config.loss_func, config.Window_length, config.lap, config.filters, config.kernel_sizes, config.head_nodes)
-    model.load_weights(filename)
-    return (model, config)
-
-################################################################################
-#
-# Running trained model functions
+# Running trained model function
 #
 ################################################################################
 
-# Run your trained 12-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
-def run_twelve_lead_model(model, header, recording):
-    return run_model(model, header, recording)
-
-# Run your trained 6-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
-def run_six_lead_model(model, header, recording):
-    return run_model(model, header, recording)
-
-# Run your trained 3-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
-def run_three_lead_model(model, header, recording):
-    return run_model(model, header, recording)
-
-# Run your trained 2-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
-def run_two_lead_model(model, header, recording):
-    return run_model(model, header, recording)
-
-# Generic function for running a trained model.
-## Change this to accept a single recording 
-## Classes should use my function get_classes()
+# Run your trained model. This function is *required*. You should edit this function to add your code, but do *not* change the arguments of this function.
 def run_model(model, header, recording):
     # Unpack model
     model, config = model
@@ -249,6 +191,69 @@ def run_model(model, header, recording):
 
 ################################################################################
 #
-# Other functions
+# File I/O functions
 #
 ################################################################################
+
+# I created these 2 functions
+def save_object(obj, filename):
+    with open(filename, 'wb') as output:  # Overwrites any existing file.
+        dill.dump(obj, output)
+
+def load_object(filename):
+    with open(filename, 'rb') as file:  # Overwrites any existing file.
+        return dill.load(file)
+
+# Load a trained model. This function is *required*. You should edit this function to add your code, but do *not* change the arguments of this function.
+def load_model(filename):
+    # Load config file, create fresh model, load weights into model
+    config = load_object(filename+'Config.pkl')
+    model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, 
+                                config.loss_func, config.Window_length, config.lap, config.filters, config.kernel_sizes, config.head_nodes)
+    model.load_weights(filename)
+    return (model, config)
+
+# Define the filename(s) for the trained models. This function is not required. You can change or remove it.
+def get_model_filename(leads):
+    sorted_leads = sort_leads(leads)
+    return 'model_' + '-'.join(sorted_leads)
+
+################################################################################
+#
+# Feature extraction function
+#
+################################################################################
+
+# # Extract features from the header and recording. This function is not required. You can change or remove it.
+# def get_features(header, recording, leads):
+#     # Extract age.
+#     age = get_age(header)
+#     if age is None:
+#         age = float('nan')
+
+#     # Extract sex. Encode as 0 for female, 1 for male, and NaN for other.
+#     sex = get_sex(header)
+#     if sex in ('Female', 'female', 'F', 'f'):
+#         sex = 0
+#     elif sex in ('Male', 'male', 'M', 'm'):
+#         sex = 1
+#     else:
+#         sex = float('nan')
+
+#     # Reorder/reselect leads in recordings.
+#     recording = choose_leads(recording, header, leads)
+
+#     # Pre-process recordings.
+#     adc_gains = get_adc_gains(header, leads)
+#     baselines = get_baselines(header, leads)
+#     num_leads = len(leads)
+#     for i in range(num_leads):
+#         recording[i, :] = (recording[i, :] - baselines[i]) / adc_gains[i]
+
+#     # Compute the root mean square of each ECG lead signal.
+#     rms = np.zeros(num_leads)
+#     for i in range(num_leads):
+#         x = recording[i, :]
+#         rms[i] = np.sqrt(np.sum(x**2) / np.size(x))
+
+#     return age, sex, rms

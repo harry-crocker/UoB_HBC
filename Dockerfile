@@ -1,4 +1,4 @@
-# FROM python:3.8.6-stretch
+python:3.8.6-stretch
 FROM tensorflow/tensorflow:2.4.1-gpu-jupyter
 
 ## The MAINTAINER instruction sets the author field of the generated images.
