@@ -23,10 +23,10 @@ class Config_file():
     pass
 
 
-dev_mode = True
-if dev_mode:
+dev_mode = False ################################
+if dev_mode: 
     import tensorflow_addons as tfa
-    import wandb
+    import wandb 
     # # Metrics
     auroc = tf.keras.metrics.AUC()
     # Also change the file names in team_code

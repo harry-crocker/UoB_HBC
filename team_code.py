@@ -91,14 +91,14 @@ def training_code(data_directory, model_directory):
         config.thresholds = [0.5]*num_classes   # Reset this
         config.lead_indexes = lead_indexes(twelve_leads, config.leads)
 
-        run = wandb.init(project='FinalModels', allow_val_change=True)  
-        wandb.config.update(vars(config), allow_val_change=True)
+        # run = wandb.init(project='FinalModels', allow_val_change=True)  ###########################
+        # wandb.config.update(vars(config), allow_val_change=True) ###########################
 
         cbs = []
         steps = config.SpE * np.ceil(len(train_recording_files) / config.batch_size) * config.epochs
         lr_schedule = OneCycleScheduler(config.lr, steps, wd=config.wd, mom_min=0.85, mom_max=0.95)
-        cbs.append(lr_schedule) ###########################
-        cbs.append(WandbCallback())
+        cbs.append(lr_schedule) 
+        # cbs.append(WandbCallback()) ###########################
 
         # Build Model
         model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, config.loss_func, 
@@ -109,8 +109,8 @@ def training_code(data_directory, model_directory):
                         steps_per_epoch= steps // config.epochs,
                         epochs=config.epochs, 
                         batch_size=config.batch_size,
-                        validation_data=train_generator(val_labels_list, val_recording_list, val_ecg_lengths, config, val=True),
-                        validation_steps=len(val_header_files)//config.batch_size,
+                        # validation_data=train_generator(val_labels_list, val_recording_list, val_ecg_lengths, config, val=True), ###################
+                        # validation_steps=len(val_header_files)//config.batch_size,  ################################
                         callbacks=cbs)
 
         #############################################
@@ -143,13 +143,13 @@ def training_code(data_directory, model_directory):
         # Use probabilities to find classwise thresholds
         thresholds = find_thresholds(np.array(labels), np.array(predictions))
         config.thresholds = thresholds
-        wandb.config.update(vars(config), allow_val_change=True)
+        # wandb.config.update(vars(config), allow_val_change=True) ##############################
 
         # Save model
         filename = os.path.join(model_directory, model_filename)
         model.save_weights(filename)
         save_object(config, filename+'Config.pkl')
-        run.join()
+        # run.join() ################################
 
 ################################################################################
 #
