@@ -228,7 +228,7 @@ class OneCycleScheduler(Callback):
 
 
 def get_lr_metric(optimizer):
-    def lr(y_true, y_pred):n
+    def lr(y_true, y_pred):
         return optimizer._decayed_lr(tf.float32) # I use ._decayed_lr method instead of .lr
     return lr
 
