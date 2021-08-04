@@ -21,9 +21,6 @@ import tensorflow as tf
 from data_funcs import *
 from model_funcs import *
 
-
-from evaluate_model import *
-import pathlib
 # import wandb
 # from wandb.keras import WandbCallback
 
@@ -34,13 +31,6 @@ four_leads = ('I', 'II', 'III', 'V2')
 three_leads = ('I', 'II', 'V2')
 two_leads = ('I', 'II')
 lead_configurations = (twelve_leads, six_leads, four_leads, three_leads, two_leads)
-
-# twelve_lead_model_filename = '12_lead_model'
-# six_lead_model_filename = '6_lead_model'
-# four_lead_model_filename = '4_lead_model'
-# three_lead_model_filename = '3_lead_model'
-# two_lead_model_filename = '2_lead_model'
-# model_filenames = (twelve_lead_model_filename, six_lead_model_filename, four_lead_model_filename, three_lead_model_filename, two_lead_model_filename) 
 
 
 ####################################s############################################
@@ -58,19 +48,7 @@ def training_code(data_directory, model_directory):
     # Extract classes from dx_mapping_scored.csv file as want to have same classes for all models
     print('Extracting classes...')
 
-
-    # DELETE THIS
-    weights_file = str(pathlib.Path(__file__).parent.resolve()) + '/weights.csv'
-    print(weights_file)
-    classes, weights = load_weights(weights_file)
-    print(classes)
-    print(len(classes))
-    print()
-
-
     classes= get_classes()
-    print(classes)
-    print(len(classes))
     num_classes = len(classes)
 
     # Extract features and labels from dataset.
@@ -165,7 +143,7 @@ def training_code(data_directory, model_directory):
             labels.append(label)
 
         # Use probabilities to find classwise thresholds
-        thresholds = find_thresholds(np.array(labels), np.array(predictions))
+        thresholds = find_thresholds(np.array(labels, dtype=np.bool), np.array(predictions))
         config.thresholds = thresholds
         # wandb.config.update(vars(config), allow_val_change=True) ##############################
 

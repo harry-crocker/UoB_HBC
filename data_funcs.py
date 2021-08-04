@@ -55,13 +55,12 @@ def get_classes():
 	return SNOMED_CT_Codes
 	'''
 
-from eval_helper_code import *
-from evaluate_model import *
+# from eval_helper_code import *
+from evaluate_model import load_weights
 
 def get_classes():
 	weights_file = os.path.join(sys.path[0], 'weights.csv')
 	classes, _ = load_weights(weights_file)
-
 	# Unpack duplicate classes
 	classes = [list(class_set)[0] for class_set in classes]
 	return classes

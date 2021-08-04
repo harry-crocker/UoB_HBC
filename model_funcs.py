@@ -438,33 +438,24 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 #     print('F1 Score on Validation:', np.mean(best_thresh_f1))
 #     return best_thresh
 
-from evaluate_model import *
-from eval_helper_code import *
+from evaluate_model import load_weights, compute_challenge_metric
 
 
 def find_thresholds(y_labels, y_hat):
 
     best_thresh = [0.5]*y_labels.shape[1]
-    best_thresh_CM = [0]*y_labels.shape[1]
+    best_thresh_CM = [-2]*y_labels.shape[1]
 
-    weights_file = 'weights.csv'
+    weights_file = os.path.join(sys.path[0], 'weights.csv')
     sinus_rhythm = set(['426783006'])
     classes, weights = load_weights(weights_file)
-
-    labels
-    binary_outputs
-
-
+    
     for i in range(y_labels.shape[1]):
         thresh = 0
         increment = 1e-2
-        y = y_labels[:, i]
         while thresh < 1:
             thresh += increment
-
-            y_pred = np.where(y_hat[:, i] > thresh, 1, 0)
-
-
+            binary_outputs np.where(y_hat > thresh, 1, 0, dtype=np.bool)
             challenge_metric = compute_challenge_metric(weights, y_labels, binary_outputs, classes, sinus_rhythm)
 
             # If new F1 score is better than previous then update threshold
@@ -472,7 +463,7 @@ def find_thresholds(y_labels, y_hat):
                 best_thresh_CM[i] = challenge_metric
                 best_thresh[i] = thresh
 
-        print('Challenge Metric: ', challenge_metric)
+        print('Challenge Metric: ', best_thresh_CM[i])
     print('Challenge Metric on Validation Set:', challenge_metric)
     return best_thresh
 
