@@ -441,13 +441,8 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 from evaluate_model import *
 from eval_helper_code import *
 
-def convert_labels(y_labels, y_hat):
-    labels_new = np.zeros(shape)
-
 
 def find_thresholds(y_labels, y_hat):
-
-    y_labels, y_hat = convert_labels(y_labels, y_hat)
 
     best_thresh = [0.5]*y_labels.shape[1]
     best_thresh_CM = [0]*y_labels.shape[1]

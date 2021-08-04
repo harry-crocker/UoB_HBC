@@ -56,6 +56,7 @@ def get_classes():
 	'''
 
 from eval_helper_code import *
+from evaluate_model import *
 
 def get_classes():
 	weights_file = os.path.join(sys.path[0], 'weights.csv')
