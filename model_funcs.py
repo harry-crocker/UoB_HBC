@@ -39,7 +39,7 @@ if dev_mode:
 # Create all configuration files
 config = Config_file()
 config.num_modules = 6 # 6
-config.lr = 3e-3  # 1e-2
+config.lr = 1e-2  # 3e-3
 config.batch_size = 128  # PTB-XL = 128
 config.optimizer='AdamWeightDecay'
 config.wd = 1e-2 # Float
@@ -51,7 +51,7 @@ config.filters = 32
 config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
 config.head_nodes = 2048
 config.val_split = 0.02
-config.epochs = 30
+config.epochs = 20
 
 
 def load_data(header_files, recording_files, leads, classes):
@@ -443,7 +443,7 @@ from evaluate_model import load_weights, compute_challenge_metric
 
 def find_thresholds(y_labels, y_hat):
     labels = y_labels.astype('bool')
-    binary_outputs = np.where(y_hat > 0.5, 1, 0)
+    binary_outputs = np.zeros(y_hat.shape())#np.where(y_hat > 0, 1, 0)
 
     best_thresh = [0.5]*y_labels.shape[1]
     best_thresh_CM = [-2]*y_labels.shape[1]
@@ -454,9 +454,8 @@ def find_thresholds(y_labels, y_hat):
     
     for i in range(y_labels.shape[1]):
         thresh = 0
-        increment = 1e-2
+        increment = 1e-3
         while thresh < 1:
-            thresh += increment
             binary_outputs[:, i] = np.where(y_hat[:, i] > thresh, 1, 0)
             binary_outputs = binary_outputs.astype('bool')
             challenge_metric = compute_challenge_metric(weights, labels, binary_outputs, classes, sinus_rhythm)
@@ -465,6 +464,8 @@ def find_thresholds(y_labels, y_hat):
             if challenge_metric > best_thresh_CM[i]:
                 best_thresh_CM[i] = challenge_metric
                 best_thresh[i] = thresh
+            thresh += increment
+            increment += 1e-3
 
         print('Challenge Metric: ', best_thresh_CM[i])
     print('Challenge Metric on Validation Set:', best_thresh_CM[-1])
