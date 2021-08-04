@@ -59,6 +59,7 @@ def training_code(data_directory, model_directory):
 
 
     # DELETE THIS
+    weights_file = 'weights.csv'
     classes, weights = load_weights(weights_file)
     print(classes)
     print(len(classes))
