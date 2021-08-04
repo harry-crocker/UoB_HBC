@@ -51,7 +51,7 @@ config.filters = 32
 config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
 config.head_nodes = 2048
 config.val_split = 0.02
-config.epochs = 10
+config.epochs = 30
 
 
 def load_data(header_files, recording_files, leads, classes):
@@ -372,16 +372,16 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
             x = keras.layers.Activation('relu')(x)
             shortcut_start = x
 
-    x = layers.GlobalAveragePooling1D()(x)
-    # x2 = layers.GlobalMaxPooling1D()(x)
+    x1 = layers.GlobalAveragePooling1D()(x)
+    x2 = layers.GlobalMaxPooling1D()(x)
 
-    # x = layers.Concatenate(axis=1)([x1, x2])
+    x = layers.Concatenate(axis=1)([x1, x2])
     
-    # x = layers.BatchNormalization()(x)
-    # x = layers.Dropout(0.25)(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.Dropout(0.25)(x)
     
-    # x = layers.Dense(head_nodes, activation='relu')(x)
-    # x = layers.Dropout(0.5)(x)
+    x = layers.Dense(head_nodes, activation='relu')(x)
+    x = layers.Dropout(0.5)(x)
 
     output_layer = layers.Dense(num_classes, activation='sigmoid')(x)
 
@@ -467,7 +467,7 @@ def find_thresholds(y_labels, y_hat):
                 best_thresh[i] = thresh
 
         print('Challenge Metric: ', best_thresh_CM[i])
-    print('Challenge Metric on Validation Set:', challenge_metric)
+    print('Challenge Metric on Validation Set:', best_thresh_CM[-1])
     print(best_thresh)
     return best_thresh
 
