@@ -60,7 +60,7 @@ def training_code(data_directory, model_directory):
 
 
     # DELETE THIS
-    weights_file = pathlib.Path(__file__).parent.resolve() + '/weights.csv'
+    weights_file = str(pathlib.Path(__file__).parent.resolve()) + '/weights.csv'
     print(weights_file)
     classes, weights = load_weights(weights_file)
     print(classes)
