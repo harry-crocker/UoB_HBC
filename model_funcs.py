@@ -414,30 +414,33 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 
 
 # Threshold funnctions
-# def find_thresholds(y_labels, y_hat):
-#     best_thresh = [0.5]*y_labels.shape[1]
-#     best_thresh_f1 = [0]*y_labels.shape[1]
+def find_thresholds(y_labels, y_hat):
+    best_thresh = [0.5]*y_labels.shape[1]
+    best_thresh_f1 = [0]*y_labels.shape[1]
 
-#     for i in range(y_labels.shape[1]):
-#         thresh = 0
-#         increment = 1e-2
-#         y = y_labels[:, i]
-#         while thresh < 1:
-#             thresh += increment
-#             y_pred = np.where(y_hat[:, i] > thresh, 1, 0)
-#             tp = np.count_nonzero(y_pred * y, axis=0)
-#             fp = np.count_nonzero(y_pred * (1 - y), axis=0)
-#             fn = np.count_nonzero((1 - y_pred) * y, axis=0)
-#             f1 = 2*tp / (2*tp + fn + fp + 1e-16)
+    for i in range(y_labels.shape[1]):
+        thresh = 0
+        increment = 1e-2
+        y = y_labels[:, i]
+        while thresh < 1:
+            thresh += increment
+            y_pred = np.where(y_hat[:, i] > thresh, 1, 0)
+            tp = np.count_nonzero(y_pred * y, axis=0)
+            fp = np.count_nonzero(y_pred * (1 - y), axis=0)
+            fn = np.count_nonzero((1 - y_pred) * y, axis=0)
+            f1 = 2*tp / (2*tp + fn + fp + 1e-16)
 
-#             # If new F1 score is better than previous then update threshold
-#             if f1 > best_thresh_f1[i]:
-#                 best_thresh_f1[i] = f1
-#                 best_thresh[i] = thresh
+            # If new F1 score is better than previous then update threshold
+            if f1 > best_thresh_f1[i]:
+                best_thresh_f1[i] = f1
+                best_thresh[i] = thresh
 
-#     print('F1 Score on Validation:', np.mean(best_thresh_f1))
-#     return best_thresh
+    print('F1 Score on Validation:', np.mean(best_thresh_f1))
+    print(best_thresh)
+    return best_thresh
 
+
+'''
 from evaluate_model import load_weights, compute_challenge_metric
 
 
@@ -471,7 +474,7 @@ def find_thresholds(y_labels, y_hat):
     print('Challenge Metric on Validation Set:', best_thresh_CM[-1])
     print(best_thresh)
     return best_thresh
-
+'''
 
 
 
