@@ -216,13 +216,14 @@ def load_object(filename):
         return dill.load(file)
 
 # Load a trained model. This function is *required*. You should edit this function to add your code, but do *not* change the arguments of this function.
-def load_model(filename):
-    # Load config file, create fresh model, load weights into model
+def load_model(model_directory, leads):
+    filename = os.path.join(model_directory, get_model_filename(leads))
     config = load_object(filename+'Config.pkl')
     model = Build_InceptionTime(config.input_shape, config.num_classes, config.num_modules, config.lr, config.wd, config.optimizer, 
                                 config.loss_func, config.Window_length, config.lap, config.filters, config.kernel_sizes, config.head_nodes)
     model.load_weights(filename)
     return (model, config)
+    
 
 # Define the filename(s) for the trained models. This function is not required. You can change or remove it.
 def get_model_filename(leads):
