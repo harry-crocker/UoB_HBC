@@ -17,9 +17,9 @@
 # different misclassification errors.
 
 import os, os.path, sys, numpy as np
-from helper_code import get_labels, is_finite_number, load_header, load_outputs
+from eval_helper_code import get_labels, is_finite_number, load_header, load_outputs
 
-def evaluate_model(label_directory, output_directory):
+def evaluate_model(label_directory, output_directory, classes, weights):
     # Identify the weights and the SNOMED CT code for the sinus rhythm class.
     weights_file = 'weights.csv'
     sinus_rhythm = set(['426783006'])

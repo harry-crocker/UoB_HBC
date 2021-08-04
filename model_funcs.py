@@ -414,30 +414,67 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 
 
 # Threshold funnctions
+# def find_thresholds(y_labels, y_hat):
+#     best_thresh = [0.5]*y_labels.shape[1]
+#     best_thresh_f1 = [0]*y_labels.shape[1]
+
+#     for i in range(y_labels.shape[1]):
+#         thresh = 0
+#         increment = 1e-2
+#         y = y_labels[:, i]
+#         while thresh < 1:
+#             thresh += increment
+#             y_pred = np.where(y_hat[:, i] > thresh, 1, 0)
+#             tp = np.count_nonzero(y_pred * y, axis=0)
+#             fp = np.count_nonzero(y_pred * (1 - y), axis=0)
+#             fn = np.count_nonzero((1 - y_pred) * y, axis=0)
+#             f1 = 2*tp / (2*tp + fn + fp + 1e-16)
+
+#             # If new F1 score is better than previous then update threshold
+#             if f1 > best_thresh_f1[i]:
+#                 best_thresh_f1[i] = f1
+#                 best_thresh[i] = thresh
+
+#     print('F1 Score on Validation:', np.mean(best_thresh_f1))
+#     return best_thresh
+
+from evaluate_model import *
+
 def find_thresholds(y_labels, y_hat):
+
+    y_labels, y_hat = convert_labels(y_labels, y_hat)
+
     best_thresh = [0.5]*y_labels.shape[1]
-    best_thresh_f1 = [0]*y_labels.shape[1]
+    best_thresh_CM = [0]*y_labels.shape[1]
+
+    weights_file = 'weights.csv'
+    sinus_rhythm = set(['426783006'])
+    classes, weights = load_weights(weights_file)
+
+    labels
+    binary_outputs
+
 
     for i in range(y_labels.shape[1]):
         thresh = 0
-        increment = 1e-3
+        increment = 1e-2
         y = y_labels[:, i]
         while thresh < 1:
             thresh += increment
+
             y_pred = np.where(y_hat[:, i] > thresh, 1, 0)
-            tp = np.count_nonzero(y_pred * y, axis=0)
-            fp = np.count_nonzero(y_pred * (1 - y), axis=0)
-            fn = np.count_nonzero((1 - y_pred) * y, axis=0)
-            f1 = 2*tp / (2*tp + fn + fp + 1e-16)
+
+
+            challenge_metric = compute_challenge_metric(weights, y_labels, binary_outputs, classes, sinus_rhythm)
 
             # If new F1 score is better than previous then update threshold
-            if f1 > best_thresh_f1[i]:
-                best_thresh_f1[i] = f1
+            if challenge_metric > best_thresh_CM[i]:
+                best_thresh_CM[i] = challenge_metric
                 best_thresh[i] = thresh
 
-    print('F1 Score on Validation:', np.mean(best_thresh_f1))
+        print('Challenge Metric: ', challenge_metric)
+    print('Challenge Metric on Validation Set:', challenge_metric)
     return best_thresh
-
 
 
 

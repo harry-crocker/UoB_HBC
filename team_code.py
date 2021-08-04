@@ -54,7 +54,21 @@ def training_code(data_directory, model_directory):
 
     # Extract classes from dx_mapping_scored.csv file as want to have same classes for all models
     print('Extracting classes...')
+
+
+    # DELETE THIS
+    from evaluate_model import *
+    classes, weights = load_weights(weights_file)
+    print(classes)
+    print(len(classes))
+    print()
+
+
+
+
     classes= get_classes()
+    print(classes)
+    print(len(classes))
     num_classes = len(classes)
 
     # Extract features and labels from dataset.
@@ -79,7 +93,7 @@ def training_code(data_directory, model_directory):
 
     # Get data
     _, train_labels_list, train_recording_list, train_ecg_lengths = load_data(train_header_files, train_recording_files, twelve_leads, classes)
-    _, val_labels_list, val_recording_list, val_ecg_lengths = load_data(val_header_files, val_recording_files, twelve_leads, classes)
+    # _, val_labels_list, val_recording_list, val_ecg_lengths = load_data(val_header_files, val_recording_files, twelve_leads, classes)  #############################
 
     # Model configuration file defined in model_funcs.py
     config.classes = classes
