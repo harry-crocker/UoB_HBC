@@ -4,12 +4,13 @@ import numpy as np
 from tensorflow.keras.callbacks import Callback
 from tensorflow import keras
 from tensorflow.keras import layers
-import tensorflow_addons as tfa
+# import tensorflow_addons as tfa
 import transformers
 # import time, sys
 
 from helper_code import *
 from data_funcs import *
+
 
 ######
 # TO DO LIST

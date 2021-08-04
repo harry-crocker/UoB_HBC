@@ -21,8 +21,8 @@ import tensorflow as tf
 from data_funcs import *
 from model_funcs import *
 
-import wandb
-from wandb.keras import WandbCallback
+# import wandb
+# from wandb.keras import WandbCallback
 
 # Define the Challenge lead sets. These variables are not required. You can change or remove them.
 twelve_leads = ('I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6')
@@ -61,9 +61,17 @@ def training_code(data_directory, model_directory):
     print('Finding Files...')
     # In the real submission all training files are in a single folder
     header_files, recording_files = find_challenge_files(data_directory)
+    num_recordings = len(recording_files)
+    sequence = []
+    for i in range(num_recordings):
+        if i % 20 == 0:
+            sequence.append(i)
+
+    header_files = [header_files[i] for i in sequence]
+    recording_files = [recording_files[i] for i in sequence]
+
     train_header_files, train_recording_files, val_header_files, val_recording_files = train_val_split(header_files, recording_files, config.val_split)
 
-    num_recordings = len(recording_files)
     print(num_recordings, 'Files found')
     print(len(train_recording_files), 'for training; ', len(val_recording_files), 'for threshold calculation')
     if not num_recordings:
