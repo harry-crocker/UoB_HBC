@@ -58,7 +58,7 @@ def training_code(data_directory, model_directory):
     num_recordings = len(recording_files)
     sequence = []
     for i in range(num_recordings):
-        if i % 20 == 0:
+        if i % 10 == 0:
             sequence.append(i)
 
     header_files = [header_files[i] for i in sequence]

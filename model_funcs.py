@@ -50,7 +50,7 @@ config.SpE = 1 # 1
 config.filters = 32
 config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
 config.head_nodes = 2048
-config.val_split = 0.01 
+config.val_split = 0.02
 config.epochs = 10
 
 
@@ -443,9 +443,7 @@ from evaluate_model import load_weights, compute_challenge_metric
 
 def find_thresholds(y_labels, y_hat):
     labels = y_labels.astype('bool')
-
-    print(y_labels[:5, :15])
-    print(y_hat[:5, :15])
+    binary_outputs = np.where(y_hat > 0.5, 1, 0)
 
     best_thresh = [0.5]*y_labels.shape[1]
     best_thresh_CM = [-2]*y_labels.shape[1]
@@ -456,13 +454,12 @@ def find_thresholds(y_labels, y_hat):
     
     for i in range(y_labels.shape[1]):
         thresh = 0
-        increment = 1e-1
+        increment = 1e-2
         while thresh < 1:
             thresh += increment
-            binary_outputs = np.where(y_hat > thresh, 1, 0)
+            binary_outputs[:, i] = np.where(y_hat[:, i] > thresh, 1, 0)
             binary_outputs = binary_outputs.astype('bool')
             challenge_metric = compute_challenge_metric(weights, labels, binary_outputs, classes, sinus_rhythm)
-            print(challenge_metric)
 
             # If new score is better than previous then update threshold
             if challenge_metric > best_thresh_CM[i]:
