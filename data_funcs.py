@@ -63,7 +63,7 @@ def get_classes():
 	classes, _ = load_weights(weights_file)
 
 	# Unpack duplicate classes
-	classes = [class_set[i] for class_set in classes]
+	classes = [class_set[0] for class_set in classes]
 	return classes
 
 
