@@ -21,6 +21,8 @@ import tensorflow as tf
 from data_funcs import *
 from model_funcs import *
 
+
+from evaluate_model import *
 # import wandb
 # from wandb.keras import WandbCallback
 
@@ -57,13 +59,10 @@ def training_code(data_directory, model_directory):
 
 
     # DELETE THIS
-    from evaluate_model import *
     classes, weights = load_weights(weights_file)
     print(classes)
     print(len(classes))
     print()
-
-
 
 
     classes= get_classes()
