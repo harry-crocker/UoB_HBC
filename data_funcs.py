@@ -39,13 +39,13 @@ def get_data(header_files, recording_files):
 	print('Recordings shape:', X.shape, y.shape)
 	return X, y
 
-
+'''
 def get_classes():
 	path_to_classes = os.path.join(sys.path[0], 'dx_mapping_scored.csv')
 	df = pd.read_csv(path_to_classes)
 	SNOMED_CT_Codes = list(df['SNOMEDCTCode'])
 	SNOMED_CT_Codes = [str(item) for item in SNOMED_CT_Codes]
-	equivalent_classes = {'713427006': '59118001', '284470004': '63593006', '427172004': '17338001'}
+	equivalent_classes = {'713427006': '59118001', '284470004': '63593006', '427172004': '17338001', '164909002': '733534002'}
 	# Remove one of equivalent classes
 	for label in equivalent_classes.keys():
 		SNOMED_CT_Codes.remove(label)
@@ -53,10 +53,21 @@ def get_classes():
 			print('Equivalent class not in classes')
 	# class_abbreviations = list(df['Abbreviation'])
 	return SNOMED_CT_Codes
+	'''
+
+from eval_helper_code import *
+
+def get_classes():
+	weights_file = os.path.join(sys.path[0], 'weights.csv')
+	classes, _ = load_weights(weights_file)
+
+	# Unpack duplicate classes
+	classes = [class_set[i] for class_set in classes]
+	return classes
 
 
 def one_hot_encode_labels(header, classes):
-	equivalent_classes = {'713427006': '59118001', '284470004': '63593006', '427172004': '17338001'}
+	equivalent_classes = {'713427006': '59118001', '284470004': '63593006', '427172004': '17338001', '164909002': '733534002'}
 	num_classes = len(classes)
 	labels = np.zeros(num_classes, dtype=np.bool) # One-hot encoding of classes
 	current_labels = get_labels(header)
