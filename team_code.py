@@ -18,6 +18,9 @@ import dill
 import numpy as np, os, sys
 import tensorflow as tf
 
+from data_funcs import *
+from model_funcs import *
+
 import wandb
 from wandb.keras import WandbCallback
 
