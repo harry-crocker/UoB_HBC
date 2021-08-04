@@ -455,7 +455,7 @@ def find_thresholds(y_labels, y_hat):
         increment = 1e-2
         while thresh < 1:
             thresh += increment
-            binary_outputs np.where(y_hat > thresh, 1, 0, dtype=np.bool)
+            binary_outputs = np.where(y_hat > thresh, 1, 0, dtype=np.bool)
             challenge_metric = compute_challenge_metric(weights, y_labels, binary_outputs, classes, sinus_rhythm)
 
             # If new F1 score is better than previous then update threshold
