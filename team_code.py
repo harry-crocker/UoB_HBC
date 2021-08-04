@@ -143,7 +143,7 @@ def training_code(data_directory, model_directory):
             labels.append(label)
 
         # Use probabilities to find classwise thresholds
-        thresholds = find_thresholds(np.array(labels, dtype=np.bool), np.array(predictions))
+        thresholds = find_thresholds(np.array(labels), np.array(predictions))
         config.thresholds = thresholds
         # wandb.config.update(vars(config), allow_val_change=True) ##############################
 
