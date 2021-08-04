@@ -43,7 +43,8 @@ def get_data(header_files, recording_files):
 def get_classes():
 	path_to_classes = os.path.join(sys.path[0], 'dx_mapping_scored.csv')
 	df = pd.read_csv(path_to_classes)
-	SNOMED_CT_Codes = list(df['SNOMED CT Code'])
+	print(df)
+	SNOMED_CT_Codes = list(df['SNOMEDCTCode'])
 	SNOMED_CT_Codes = [str(item) for item in SNOMED_CT_Codes]
 	equivalent_classes = {'713427006': '59118001', '284470004': '63593006', '427172004': '17338001'}
 	# Remove one of equivalent classes
