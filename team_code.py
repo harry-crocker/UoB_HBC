@@ -56,13 +56,14 @@ def training_code(data_directory, model_directory):
     # In the real submission all training files are in a single folder
     header_files, recording_files = find_challenge_files(data_directory)
     num_recordings = len(recording_files)
-    sequence = []
-    for i in range(num_recordings):
-        if i % 20 == 0:
-            sequence.append(i)
+    
+    # sequence = []
+    # for i in range(num_recordings):
+    #     if i % 20 == 0:
+    #         sequence.append(i)
 
-    header_files = [header_files[i] for i in sequence]
-    recording_files = [recording_files[i] for i in sequence]
+    # header_files = [header_files[i] for i in sequence]
+    # recording_files = [recording_files[i] for i in sequence]
 
     train_header_files, train_recording_files, val_header_files, val_recording_files = train_val_split(header_files, recording_files, config.val_split)
 

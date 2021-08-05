@@ -50,8 +50,8 @@ config.SpE = 1 # 1
 config.filters = 32
 config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
 config.head_nodes = 2048
-config.val_split = 0.02
-config.epochs = 20
+config.val_split = 0.04
+config.epochs = 50
 
 
 def load_data(header_files, recording_files, leads, classes):
