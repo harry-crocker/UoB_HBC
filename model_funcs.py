@@ -447,7 +447,7 @@ from evaluate_model import load_weights, compute_challenge_metric
 
 def find_thresholds(y_labels, y_hat):
     labels = y_labels.astype('bool')
-    binary_outputs = np.zeros(y_hat.shape)#np.where(y_hat > 0, 1, 0)
+    binary_outputs = np.zeros(y_hat.shape)
 
     best_thresh = [0.5]*y_labels.shape[1]
     best_thresh_CM = [-2]*y_labels.shape[1]
@@ -477,7 +477,6 @@ def find_thresholds(y_labels, y_hat):
     print('Challenge Metric on Validation Set:', best_thresh_CM[-1])
     print(best_thresh)
     return best_thresh
-'''
 
 
 
