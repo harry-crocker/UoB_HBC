@@ -414,6 +414,7 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 
 
 # Threshold funnctions
+'''
 def find_thresholds(y_labels, y_hat):
     best_thresh = [0.5]*y_labels.shape[1]
     best_thresh_f1 = [0]*y_labels.shape[1]
@@ -466,11 +467,13 @@ def find_thresholds(y_labels, y_hat):
             # If new score is better than previous then update threshold
             if challenge_metric > best_thresh_CM[i]:
                 best_thresh_CM[i] = challenge_metric
+                best_binary_outputs = binary_outputs
                 best_thresh[i] = thresh
             thresh += increment
             increment += 1e-3
 
         print('Challenge Metric: ', best_thresh_CM[i])
+        binary_outputs = best_binary_outputs
     print('Challenge Metric on Validation Set:', best_thresh_CM[-1])
     print(best_thresh)
     return best_thresh
