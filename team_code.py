@@ -56,7 +56,7 @@ def training_code(data_directory, model_directory):
     # In the real submission all training files are in a single folder
     header_files, recording_files = find_challenge_files(data_directory)
     num_recordings = len(recording_files)
-    
+
     # sequence = []
     # for i in range(num_recordings):
     #     if i % 20 == 0:
@@ -74,7 +74,7 @@ def training_code(data_directory, model_directory):
 
     # Get data
     _, train_labels_list, train_recording_list, train_ecg_lengths = load_data(train_header_files, train_recording_files, twelve_leads, classes)
-    # _, val_labels_list, val_recording_list, val_ecg_lengths = load_data(val_header_files, val_recording_files, twelve_leads, classes)  #############################
+    _, val_labels_list, val_recording_list, val_ecg_lengths = load_data(val_header_files, val_recording_files, twelve_leads, classes)  #############################
 
     # Model configuration file defined in model_funcs.py
     config.classes = classes
@@ -112,8 +112,8 @@ def training_code(data_directory, model_directory):
                         steps_per_epoch= steps // config.epochs,
                         epochs=config.epochs, 
                         batch_size=config.batch_size,
-                        # validation_data=train_generator(val_labels_list, val_recording_list, val_ecg_lengths, config, val=True), ###################
-                        # validation_steps=len(val_header_files)//config.batch_size,  ################################
+                        validation_data=train_generator(val_labels_list, val_recording_list, val_ecg_lengths, config, val=True), ###################
+                        validation_steps=len(val_header_files)//config.batch_size,  ################################
                         callbacks=cbs)
 
         #############################################
