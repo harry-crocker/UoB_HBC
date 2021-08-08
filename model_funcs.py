@@ -39,7 +39,7 @@ if dev_mode:
 # Create all configuration files
 config = Config_file()
 config.num_modules = 6 # 6
-config.lr = 1e-2  # 3e-3
+config.lr = 3e-3
 config.batch_size = 128  # PTB-XL = 128
 config.optimizer='AdamWeightDecay'
 config.wd = 1e-2 # Float
