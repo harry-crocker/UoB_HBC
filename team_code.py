@@ -111,8 +111,8 @@ def training_code(data_directory, model_directory):
                         steps_per_epoch= steps // config.epochs,
                         epochs=config.epochs, 
                         batch_size=config.batch_size,
-                        validation_data=train_generator(val_labels_list, val_recording_list, val_ecg_lengths, config, val=True), ###################
-                        validation_steps=len(val_header_files)//config.batch_size,  ################################
+                        # validation_data=train_generator(val_labels_list, val_recording_list, val_ecg_lengths, config, val=True), ###################
+                        # validation_steps=len(val_header_files)//config.batch_size,  ################################
                         callbacks=cbs)
 
         #############################################

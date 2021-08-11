@@ -40,7 +40,7 @@ if dev_mode:
 config = Config_file()
 config.num_modules = 6 # 6
 config.lr = 3e-3
-config.batch_size = 128  # PTB-XL = 128
+config.batch_size = 256  # PTB-XL = 128
 config.optimizer='AdamWeightDecay'
 config.wd = 1e-2 # Float
 config.Window_length = 250 # 250
@@ -50,7 +50,7 @@ config.SpE = 1 # 1
 config.filters = 32
 config.kernel_sizes = [3, 7, 17] #[9, 23, 49]
 config.head_nodes = 2048
-config.val_split = 0.04
+config.val_split = 0.08
 config.epochs = 50
 
 
@@ -414,14 +414,13 @@ def Build_InceptionTime(input_shape, num_classes, num_modules, learning_rate, wd
 
 
 # Threshold funnctions
-'''
 def find_thresholds(y_labels, y_hat):
     best_thresh = [0.5]*y_labels.shape[1]
     best_thresh_f1 = [0]*y_labels.shape[1]
 
     for i in range(y_labels.shape[1]):
         thresh = 0
-        increment = 1e-2
+        increment = 1e-3
         y = y_labels[:, i]
         while thresh < 1:
             thresh += increment
@@ -477,6 +476,6 @@ def find_thresholds(y_labels, y_hat):
     print('Challenge Metric on Validation Set:', best_thresh_CM[-1])
     print(best_thresh)
     return best_thresh
-
+'''
 
 
