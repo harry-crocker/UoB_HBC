@@ -461,7 +461,7 @@ def find_thresholds(y_labels, y_hat):
         increment = 1e-3
         while thresh < 1:
             thresh += increment
-            increment += 1e-3
+            # increment += 1e-3
             binary_outputs[:, i] = np.where(y_hat[:, i] > thresh, 1, 0)
             binary_outputs = binary_outputs.astype('bool')
             challenge_metric = compute_challenge_metric(weights, labels, binary_outputs, classes, sinus_rhythm)
